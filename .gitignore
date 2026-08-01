@@ -1,0 +1,11 @@
+# Logs
+*.log
+
+# OS Generated
+.DS_Store
+Thumbs.db
+
+# IDE & Workspace
+.idea/
+.vscode/
+*.swp

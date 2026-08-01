@@ -1,0 +1,692 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Enterprise Bulk Email Portal with AI Email Optimizer Bot, Spam Protection Engine, and Owner Admin Dashboard.">
+  <title>MailPulse AI - Enterprise Bulk Email Marketing & Outreach Portal</title>
+  
+  <!-- Google Fonts & Icons -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  
+  <!-- Chart.js CDN for Owner Analytics -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <!-- Application Stylesheet -->
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <div class="app-container">
+    
+    <!-- Top Navigation Bar -->
+    <header class="navbar">
+      <div class="nav-brand">
+        <div class="brand-icon">
+          <i data-lucide="send" style="width:22px; height:22px;"></i>
+        </div>
+        <div>
+          <span class="brand-title">MailPulse AI</span>
+          <span class="brand-badge">Enterprise Bulk Engine</span>
+        </div>
+      </div>
+
+      <!-- View Switcher (Sender Panel vs Owner Panel) -->
+      <div class="nav-controls">
+        <div class="view-switcher">
+          <button id="btnSwitchSenderView" class="switch-btn active">
+            <i data-lucide="mail-plus" style="width:16px;height:16px;"></i>
+            <span>Sender Outreach Panel</span>
+          </button>
+          <button id="btnSwitchOwnerView" class="switch-btn">
+            <i data-lucide="shield-check" style="width:16px;height:16px;"></i>
+            <span>Owner Control Panel</span>
+          </button>
+        </div>
+
+        <!-- Sender Profile Pill -->
+        <div id="senderPillInfo" class="sender-pill" title="Click to configure Sender Email & SMTP Settings">
+          <!-- Populated dynamically by SenderController -->
+        </div>
+      </div>
+    </header>
+
+    <!-- Main Wrapper -->
+    <main class="main-wrapper">
+
+      <!-- ===================================================================
+           VIEW 1: SENDER OUTREACH PANEL
+           =================================================================== -->
+      <div id="senderPanelContainer" class="view-panel active">
+        
+        <div class="grid-main-sidebar">
+          
+          <!-- LEFT CONTENT AREA: Composer, AI Bot, Companies & Files -->
+          <div class="main-content-col">
+            
+            <!-- AI Email Optimizer Bot Header Box -->
+            <div class="ai-bot-box">
+              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.75rem;">
+                <div>
+                  <h3 style="font-size:1.1rem; font-weight:700; color:white; display:flex; align-items:center; gap:0.5rem;">
+                    <i data-lucide="bot" style="color:#c084fc;"></i> AI Email Optimizer Bot (Gemini Engine)
+                  </h3>
+                  <p style="font-size:0.825rem; color:var(--text-muted); margin-top:2px;">
+                    Dynamically tailors email copy & subject lines based on each recipient's industry.
+                  </p>
+                </div>
+                <div id="aiStatusBadge" class="badge badge-purple">
+                  <i data-lucide="sparkles" style="width:12px;height:12px;"></i> AI Bot Active
+                </div>
+              </div>
+
+              <!-- AI Controls Bar -->
+              <div style="display:flex; gap:1.5rem; align-items:center; background:rgba(0,0,0,0.25); padding:0.8rem 1rem; border-radius:var(--radius-md);">
+                <!-- AI Switch Toggle -->
+                <div style="display:flex; align-items:center; gap:0.75rem;">
+                  <span style="font-size:0.85rem; font-weight:600; color:var(--text-main);">AI Optimizer Toggle:</span>
+                  <label class="toggle-switch">
+                    <input type="checkbox" id="toggleAiOptimizer" checked>
+                    <span class="slider"></span>
+                  </label>
+                </div>
+
+                <!-- Tone Selector -->
+                <div id="aiToneGroup" style="display:flex; align-items:center; gap:0.6rem; flex:1;">
+                  <span style="font-size:0.85rem; font-weight:600; color:var(--text-muted);">Outreach Tone:</span>
+                  <select id="aiToneSelect" class="form-control" style="padding:0.4rem 0.8rem; font-size:0.85rem; width:auto;">
+                    <option value="Consultative">Consultative (Recommended)</option>
+                    <option value="Persuasive">Persuasive (Sales Heavy)</option>
+                    <option value="Professional">Professional & Formal</option>
+                    <option value="Friendly">Friendly & Casual</option>
+                  </select>
+                </div>
+
+                <!-- Side-by-Side Preview Trigger -->
+                <button id="btnPreviewAi" class="btn btn-secondary btn-sm" style="border-color:rgba(139,92,246,0.4);">
+                  <i data-lucide="split" style="width:14px;height:14px;color:#c084fc;"></i> Live AI Preview
+                </button>
+              </div>
+            </div>
+
+            <!-- Email Composer Glass Card -->
+            <div class="glass-card" style="margin-bottom:1.5rem;">
+              <div class="card-header">
+                <div>
+                  <h2 class="card-title">
+                    <i data-lucide="file-edit" style="color:var(--accent-primary);"></i> Campaign Email Composer
+                  </h2>
+                  <p class="card-subtitle">Design master template with dynamic tags for personalized bulk sending.</p>
+                </div>
+              </div>
+
+              <!-- Tokens Bar -->
+              <div style="margin-bottom: 1rem; display:flex; align-items:center; gap:0.5rem; flex-wrap:wrap;">
+                <span style="font-size:0.75rem; font-weight:700; color:var(--text-subtle); text-transform:uppercase;">Insert Dynamic Tags:</span>
+                <button class="btn btn-secondary btn-sm btn-token" data-token="{{company_name}}">+ {{company_name}}</button>
+                <button class="btn btn-secondary btn-sm btn-token" data-token="{{contact_person}}">+ {{contact_person}}</button>
+                <button class="btn btn-secondary btn-sm btn-token" data-token="{{industry}}">+ {{industry}}</button>
+                <button class="btn btn-secondary btn-sm btn-token" data-token="{{sender_name}}">+ {{sender_name}}</button>
+              </div>
+
+              <!-- Subject Input -->
+              <div class="form-group">
+                <label class="form-label" for="composerSubject">Email Subject Line</label>
+                <input type="text" id="composerSubject" class="form-control" placeholder="e.g. Unlocking 3x Growth Potential for {{company_name}}">
+              </div>
+
+              <!-- Body Textarea -->
+              <div class="form-group" style="margin-bottom:0.5rem;">
+                <label class="form-label" for="composerBody">Email Body Copy (HTML / Plain Text)</label>
+                <textarea id="composerBody" class="form-control" style="min-height:220px;" placeholder="Write your pitch content here..."></textarea>
+              </div>
+            </div>
+
+            <!-- Target Company & Attachment Management Card -->
+            <div class="glass-card">
+              <div class="card-header">
+                <div>
+                  <h2 class="card-title">
+                    <i data-lucide="building-2" style="color:var(--accent-cyan);"></i> Target Companies & Campaign Files
+                  </h2>
+                  <p class="card-subtitle">Attach company leads and upload brochures or pitch decks for bulk email dispatches.</p>
+                </div>
+                <div style="display:flex; gap:0.5rem;">
+                  <!-- Import CSV Trigger -->
+                  <label class="btn btn-secondary btn-sm" style="cursor:pointer;">
+                    <i data-lucide="file-spreadsheet" style="width:14px;height:14px;color:var(--accent-emerald);"></i> Import CSV
+                    <input type="file" id="csvFileInput" accept=".csv" style="display:none;">
+                  </label>
+                  
+                  <button id="btnAddCompany" class="btn btn-primary btn-sm">
+                    <i data-lucide="plus" style="width:14px;height:14px;"></i> Add Company
+                  </button>
+                  
+                  <button id="btnClearCompanies" class="btn btn-secondary btn-sm" title="Clear all">
+                    <i data-lucide="trash-2" style="width:14px;height:14px;"></i>
+                  </button>
+                </div>
+              </div>
+
+              <!-- File Attachments Dropzone -->
+              <div style="margin-bottom: 1.25rem;">
+                <label class="form-label">Attached Collateral Files (PDF, Pitch Decks, Images)</label>
+                <div id="fileDropzone" class="dropzone">
+                  <i data-lucide="upload-cloud" class="dropzone-icon"></i>
+                  <p style="font-size:0.875rem; font-weight:600; color:var(--text-main);">Click or drag files here to attach to campaign</p>
+                  <p style="font-size:0.75rem; color:var(--text-muted); margin-top:4px;">Supports PDF, DOCX, PNG, JPG (Max 10MB per file)</p>
+                  <input type="file" id="fileAttachmentInput" multiple style="display:none;">
+                </div>
+                <div id="attachedFilesContainer" style="margin-top:0.6rem;">
+                  <!-- File tags rendered here -->
+                </div>
+              </div>
+
+              <!-- Companies Table -->
+              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.6rem;">
+                <span id="targetCompanyCount" style="font-size:0.85rem; font-weight:700; color:var(--text-muted);">0 Companies Attached</span>
+                <span style="font-size:0.75rem; color:var(--text-subtle);">Every email receives a dynamic personalized copy</span>
+              </div>
+              
+              <div class="table-responsive">
+                <table class="custom-table">
+                  <thead>
+                    <tr>
+                      <th>Company Name</th>
+                      <th>Industry</th>
+                      <th>Target Email</th>
+                      <th>Contact Person</th>
+                      <th>Status</th>
+                      <th style="text-align:right;">Action</th>
+                    </tr>
+                  </thead>
+                  <tbody id="companyTableBody">
+                    <!-- Populated by LeadsController -->
+                  </tbody>
+                </table>
+              </div>
+
+            </div>
+
+          </div>
+
+          <!-- RIGHT SIDEBAR: Spam Auditor & Bulk Dispatch Console -->
+          <div class="sidebar-col">
+            
+            <!-- Spam Auditor Glass Card -->
+            <div class="spam-meter-card" style="margin-bottom:1.5rem;">
+              <div class="meter-header">
+                <div>
+                  <h3 style="font-size:1rem; font-weight:700; color:white; display:flex; align-items:center; gap:0.5rem;">
+                    <i data-lucide="shield-alert" style="color:var(--accent-amber);"></i> Deliverability & Spam Score
+                  </h3>
+                  <p style="font-size:0.75rem; color:var(--text-muted);">Ensures bulk emails land in Inbox, not Spam.</p>
+                </div>
+                <span id="spamScoreVal" style="font-size:1.6rem; font-weight:800; color:white;">92/100</span>
+              </div>
+
+              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.4rem;">
+                <span style="font-size:0.75rem; color:var(--text-muted);">Health Meter</span>
+                <span id="spamStatusBadge" class="badge badge-success">Inbox Ready</span>
+              </div>
+
+              <!-- Progress Bar -->
+              <div class="meter-bar-outer">
+                <div id="spamMeterBarInner" class="meter-bar-inner"></div>
+              </div>
+
+              <!-- Warnings & Checks List -->
+              <div id="spamWarningsList" class="spam-checks-list" style="margin-bottom:0.75rem;">
+                <!-- Warnings injected here -->
+              </div>
+              <div id="spamPassesList" class="spam-checks-list" style="margin-bottom:1rem;">
+                <!-- Passes injected here -->
+              </div>
+
+              <!-- 1-Click Auto-Fix Button -->
+              <button id="btnSpamAutoFix" class="btn btn-amber" style="width:100%; display:none;">
+                <i data-lucide="wand-2" style="width:16px;height:16px;"></i> 1-Click Auto-Fix Deliverability
+              </button>
+            </div>
+
+            <!-- Bulk Dispatch Console Card -->
+            <div class="glass-card">
+              <div class="card-header" style="margin-bottom:0.8rem;">
+                <h2 class="card-title">
+                  <i data-lucide="rocket" style="color:var(--accent-emerald);"></i> Bulk Dispatch Console
+                </h2>
+              </div>
+
+              <!-- Staggered Sending Delay Slider -->
+              <div class="form-group" style="margin-bottom:1rem;">
+                <div style="display:flex; justify-content:space-between; margin-bottom:0.3rem;">
+                  <label class="form-label" style="margin:0;">Staggered Sending Delay</label>
+                  <span id="dispatchDelayVal" style="font-size:0.8rem; font-weight:700; color:var(--accent-cyan);">4 sec / email</span>
+                </div>
+                <input type="range" id="dispatchDelaySlider" min="1" max="10" value="4" style="width:100%; accent-color:var(--accent-cyan);">
+                <span style="font-size:0.725rem; color:var(--text-subtle);">Spaces out dispatches to prevent mail server throttling.</span>
+              </div>
+
+              <!-- Dispatch Progress Bar -->
+              <div style="margin-bottom:1rem;">
+                <div style="display:flex; justify-content:space-between; margin-bottom:0.3rem;">
+                  <span style="font-size:0.8rem; font-weight:600; color:var(--text-muted);">Queue Progress</span>
+                  <span id="dispatchProgressStatusText" style="font-size:0.8rem; color:var(--text-main);">Ready to send</span>
+                </div>
+                <div style="height:8px; background:rgba(255,255,255,0.1); border-radius:4px; overflow:hidden;">
+                  <div id="dispatchProgressBarInner" style="height:100%; width:0%; background:linear-gradient(90deg, #10b981, #06b6d4); transition:width 0.3s ease;"></div>
+                </div>
+              </div>
+
+              <!-- Action Buttons -->
+              <div style="display:flex; gap:0.75rem; margin-bottom:1.25rem;">
+                <button id="btnStartDispatch" class="btn btn-emerald" style="flex:1;">
+                  <i data-lucide="play" style="width:16px;height:16px;"></i> Start Bulk Dispatch
+                </button>
+                <button id="btnStopDispatch" class="btn btn-rose" style="display:none; flex:1;">
+                  <i data-lucide="square" style="width:16px;height:16px;"></i> Stop Dispatch
+                </button>
+              </div>
+
+              <!-- Live Log Stream -->
+              <div>
+                <label class="form-label">Real-Time Dispatch Console Logs</label>
+                <div id="dispatchConsoleLogs" class="log-box">
+                  <div class="log-line">
+                    <span class="log-time">[Ready]</span>
+                    <span class="log-msg">System initialized. Click "Start Bulk Dispatch" to launch campaign.</span>
+                  </div>
+                </div>
+              </div>
+
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+
+      <!-- ===================================================================
+           VIEW 2: OWNER MASTER CONTROL PANEL
+           =================================================================== -->
+      <div id="ownerPanelContainer" class="view-panel">
+        
+        <!-- Owner Header Banner -->
+        <div style="background:linear-gradient(135deg, rgba(30,27,75,0.8), rgba(15,23,42,0.9)); border:1px solid rgba(99,102,241,0.3); border-radius:var(--radius-lg); padding:1.5rem; margin-bottom:1.5rem; display:flex; justify-content:space-between; align-items:center;">
+          <div>
+            <h1 style="font-size:1.4rem; font-weight:800; color:white; display:flex; align-items:center; gap:0.6rem;">
+              <i data-lucide="shield-check" style="color:var(--accent-emerald);"></i> Owner Master Oversight Dashboard
+            </h1>
+            <p style="font-size:0.875rem; color:var(--text-muted); margin-top:4px;">
+              Full control, analytics, and raw sent email content inspection for all team marketing dispatches.
+            </p>
+          </div>
+          <span class="badge badge-purple" style="padding:0.4rem 0.8rem; font-size:0.85rem;">
+            <i data-lucide="lock" style="width:14px;height:14px;"></i> Owner Access Granted
+          </span>
+        </div>
+
+        <!-- Metric KPI Cards Grid -->
+        <div class="grid-4" style="margin-bottom:1.5rem;">
+          <div class="metric-card cyan">
+            <span class="metric-lbl">Total Bulk Emails Sent</span>
+            <div id="ownerMetricTotalSent" class="metric-val">0</div>
+            <span class="metric-trend"><i data-lucide="trending-up" style="width:12px;height:12px;"></i> Active Campaign</span>
+          </div>
+
+          <div class="metric-card emerald">
+            <span class="metric-lbl">Delivery Rate (Inbox)</span>
+            <div id="ownerMetricDeliveryRate" class="metric-val">99.4%</div>
+            <span class="metric-trend"><i data-lucide="check" style="width:12px;height:12px;"></i> High Reputation</span>
+          </div>
+
+          <div class="metric-card purple">
+            <span class="metric-lbl">AI Optimizer Usage</span>
+            <div id="ownerMetricAiCount" class="metric-val">0</div>
+            <span class="metric-trend" style="background:rgba(139,92,246,0.2); color:#c084fc;">
+              <i data-lucide="sparkles" style="width:12px;height:12px;"></i> Gemini Powered
+            </span>
+          </div>
+
+          <div class="metric-card amber">
+            <span class="metric-lbl">Estimated Spam Rate</span>
+            <div id="ownerMetricSpamRate" class="metric-val">0.2%</div>
+            <span class="metric-trend" style="background:rgba(16,185,129,0.15); color:#34d399;">
+              <i data-lucide="shield-check" style="width:12px;height:12px;"></i> Below 0.3% Limit
+            </span>
+          </div>
+        </div>
+
+        <!-- Analytics Chart Glass Card -->
+        <div class="glass-card" style="margin-bottom:1.5rem;">
+          <div class="card-header">
+            <div>
+              <h2 class="card-title">
+                <i data-lucide="bar-chart-3" style="color:var(--accent-primary);"></i> Dispatch Volume & AI Personalization Analytics
+              </h2>
+              <p class="card-subtitle">Real-time daily dispatch trajectory and inbox placement metrics.</p>
+            </div>
+          </div>
+          <div style="height: 260px; position: relative;">
+            <canvas id="ownerAnalyticsChart"></canvas>
+          </div>
+        </div>
+
+        <!-- Sent Emails Log Inspector Table -->
+        <div class="glass-card" style="margin-bottom:1.5rem;">
+          <div class="card-header">
+            <div>
+              <h2 class="card-title">
+                <i data-lucide="file-text" style="color:var(--accent-cyan);"></i> Sent Email Master Logs (Owner Inspection)
+              </h2>
+              <p class="card-subtitle">Search and inspect the exact body content of any email dispatched by the system.</p>
+            </div>
+            
+            <!-- Search Bar -->
+            <div style="width: 300px;">
+              <input type="text" id="ownerSearchLogInput" class="form-control" placeholder="Search company, recipient or subject...">
+            </div>
+          </div>
+
+          <div class="table-responsive">
+            <table class="custom-table">
+              <thead>
+                <tr>
+                  <th>Log ID</th>
+                  <th>Timestamp</th>
+                  <th>Recipient Company</th>
+                  <th>Subject Line</th>
+                  <th>AI Status</th>
+                  <th>Delivery Status</th>
+                  <th style="text-align:right;">Raw Content</th>
+                </tr>
+              </thead>
+              <tbody id="ownerLogsTableBody">
+                <!-- Populated by OwnerPanelController -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Domain Security & SPF/DKIM/DMARC Health -->
+        <div class="glass-card">
+          <div class="card-header">
+            <div>
+              <h2 class="card-title">
+                <i data-lucide="shield" style="color:var(--accent-emerald);"></i> Domain Deliverability & DNS Reputation Health
+              </h2>
+              <p class="card-subtitle">System recommendations to prevent domain blacklisting when sending bulk outreach.</p>
+            </div>
+          </div>
+
+          <div class="grid-3">
+            <div style="background:rgba(0,0,0,0.3); padding:1rem; border-radius:var(--radius-md); border:1px solid var(--border-color);">
+              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.5rem;">
+                <span style="font-size:0.85rem; font-weight:700; color:white;">SPF Record Check</span>
+                <span class="badge badge-success">Verified</span>
+              </div>
+              <p id="ownerSpfStatus" style="font-size:0.75rem; color:var(--text-muted); font-family:monospace;">Loading...</p>
+            </div>
+
+            <div style="background:rgba(0,0,0,0.3); padding:1rem; border-radius:var(--radius-md); border:1px solid var(--border-color);">
+              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.5rem;">
+                <span style="font-size:0.85rem; font-weight:700; color:white;">DKIM Signature</span>
+                <span class="badge badge-success">Verified</span>
+              </div>
+              <p id="ownerDkimStatus" style="font-size:0.75rem; color:var(--text-muted); font-family:monospace;">Loading...</p>
+            </div>
+
+            <div style="background:rgba(0,0,0,0.3); padding:1rem; border-radius:var(--radius-md); border:1px solid var(--border-color);">
+              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.5rem;">
+                <span style="font-size:0.85rem; font-weight:700; color:white;">DMARC Policy</span>
+                <span class="badge badge-success">Active</span>
+              </div>
+              <p id="ownerDmarcStatus" style="font-size:0.75rem; color:var(--text-muted); font-family:monospace;">Loading...</p>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+    </main>
+
+  </div>
+
+  <!-- ===================================================================
+       MODAL 1: SENDER LOGIN & SMTP SETUP
+       =================================================================== -->
+  <div id="senderLoginModal" class="modal-overlay">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3 style="font-size:1.1rem; font-weight:700; color:white; display:flex; align-items:center; gap:0.5rem;">
+          <i data-lucide="key-round" style="color:var(--accent-primary);"></i> Sender Email & SMTP Configuration
+        </h3>
+        <button class="close-btn close-modal-trigger">&times;</button>
+      </div>
+      
+      <form id="senderLoginForm">
+        <div class="modal-body">
+          <p style="font-size:0.85rem; color:var(--text-muted); margin-bottom:1.25rem;">
+            Log in with your sender email credentials to dispatch marketing campaigns.
+          </p>
+
+          <div class="grid-2">
+            <div class="form-group">
+              <label class="form-label" for="inputSenderEmail">Sender Email Address *</label>
+              <input type="email" id="inputSenderEmail" class="form-control" required placeholder="alex@company.com">
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="inputSenderName">Display Sender Name</label>
+              <input type="text" id="inputSenderName" class="form-control" placeholder="Alex Rivera (Growth Lead)">
+            </div>
+          </div>
+
+          <div class="grid-2">
+            <div class="form-group">
+              <label class="form-label" for="inputSmtpHost">SMTP Host Server</label>
+              <input type="text" id="inputSmtpHost" class="form-control" placeholder="smtp.gmail.com">
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="inputSmtpPort">SMTP Port</label>
+              <input type="number" id="inputSmtpPort" class="form-control" value="587">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="inputAppPassword">SMTP App Password / Access Token</label>
+            <input type="password" id="inputAppPassword" class="form-control" placeholder="••••••••••••••••">
+          </div>
+
+          <div class="form-group" style="margin-bottom:0;">
+            <label class="form-label" for="inputSenderSignature">Sender Email Signature</label>
+            <textarea id="inputSenderSignature" class="form-control" style="min-height:80px;" placeholder="Best regards,&#10;Alex Rivera | Head of Outreach"></textarea>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary close-modal-trigger">Cancel</button>
+          <button type="submit" class="btn btn-primary">Save & Connect Sender</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ===================================================================
+       MODAL 2: ADD TARGET COMPANY
+       =================================================================== -->
+  <div id="addCompanyModal" class="modal-overlay">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3 style="font-size:1.1rem; font-weight:700; color:white; display:flex; align-items:center; gap:0.5rem;">
+          <i data-lucide="building" style="color:var(--accent-cyan);"></i> Add Target Outreach Company
+        </h3>
+        <button class="close-btn close-modal-trigger">&times;</button>
+      </div>
+
+      <form id="addCompanyForm">
+        <div class="modal-body">
+          <div class="grid-2">
+            <div class="form-group">
+              <label class="form-label" for="newCompanyName">Company Name *</label>
+              <input type="text" id="newCompanyName" class="form-control" required placeholder="Acme Corporation">
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="newCompanyIndustry">Industry Sector *</label>
+              <select id="newCompanyIndustry" class="form-control">
+                <option value="FinTech">FinTech / Finance</option>
+                <option value="Healthcare">Healthcare / BioTech</option>
+                <option value="SaaS">SaaS / Cloud Tech</option>
+                <option value="E-Commerce">E-Commerce / Retail</option>
+                <option value="Logistics">Logistics / Supply Chain</option>
+                <option value="Manufacturing">Manufacturing / IoT</option>
+                <option value="General">General Business</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="grid-2">
+            <div class="form-group">
+              <label class="form-label" for="newCompanyEmail">Target Contact Email *</label>
+              <input type="email" id="newCompanyEmail" class="form-control" required placeholder="john@acmecorp.com">
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="newCompanyPerson">Contact Person Name</label>
+              <input type="text" id="newCompanyPerson" class="form-control" placeholder="John Doe">
+            </div>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary close-modal-trigger">Cancel</button>
+          <button type="submit" class="btn btn-emerald">Add to Campaign List</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ===================================================================
+       MODAL 3: AI SIDE-BY-SIDE PREVIEW
+       =================================================================== -->
+  <div id="aiPreviewModal" class="modal-overlay">
+    <div class="modal-card" style="max-width:900px;">
+      <div class="modal-header">
+        <h3 style="font-size:1.1rem; font-weight:700; color:white; display:flex; align-items:center; gap:0.5rem;">
+          <i data-lucide="sparkles" style="color:#c084fc;"></i> AI Optimization Side-by-Side Comparison
+        </h3>
+        <button class="close-btn close-modal-trigger">&times;</button>
+      </div>
+
+      <div class="modal-body">
+        <div style="margin-bottom:1rem; font-size:0.875rem; color:var(--text-muted);">
+          Previewing AI Email Bot output for target: <strong id="aiPreviewCompName" style="color:white;">Nexus Financial Systems (FinTech)</strong>
+        </div>
+
+        <div class="grid-2">
+          <!-- Standard Copy -->
+          <div style="background:rgba(0,0,0,0.4); border:1px solid var(--border-color); border-radius:var(--radius-md); padding:1rem;">
+            <div style="font-size:0.75rem; font-weight:700; color:var(--text-subtle); text-transform:uppercase; margin-bottom:0.5rem;">
+              📄 Standard Template Copy
+            </div>
+            <div style="font-size:0.85rem; font-weight:600; color:var(--text-main); margin-bottom:0.75rem;" id="previewOriginalSubject">
+              Subject...
+            </div>
+            <div style="font-size:0.8rem; color:var(--text-muted); white-space:pre-wrap; font-family:sans-serif;" id="previewOriginalBody">
+              Body...
+            </div>
+          </div>
+
+          <!-- AI Tailored Copy -->
+          <div style="background:linear-gradient(135deg, rgba(88,28,135,0.3), rgba(30,27,75,0.4)); border:1px solid rgba(139,92,246,0.5); border-radius:var(--radius-md); padding:1rem;">
+            <div style="font-size:0.75rem; font-weight:700; color:#c084fc; text-transform:uppercase; margin-bottom:0.5rem; display:flex; align-items:center; gap:0.3rem;">
+              <i data-lucide="bot" style="width:12px;height:12px;"></i> ✨ AI Optimized Copy (Gemini)
+            </div>
+            <div style="font-size:0.85rem; font-weight:600; color:white; margin-bottom:0.75rem;" id="previewAiSubject">
+              Subject...
+            </div>
+            <div style="font-size:0.8rem; color:#e2e8f0; white-space:pre-wrap; font-family:sans-serif;" id="previewAiBody">
+              Body...
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn btn-primary close-modal-trigger">Looks Great! Close Preview</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================================================================
+       MODAL 4: OWNER RAW EMAIL CONTENT INSPECTOR
+       =================================================================== -->
+  <div id="inspectEmailModal" class="modal-overlay">
+    <div class="modal-card" style="max-width:750px;">
+      <div class="modal-header">
+        <h3 style="font-size:1.1rem; font-weight:700; color:white; display:flex; align-items:center; gap:0.5rem;">
+          <i data-lucide="eye" style="color:var(--accent-cyan);"></i> Raw Sent Email Inspector (Log ID: <span id="inspectLogId">LOG-9001</span>)
+        </h3>
+        <button class="close-btn close-modal-trigger">&times;</button>
+      </div>
+
+      <div class="modal-body">
+        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:0.75rem; background:rgba(0,0,0,0.3); padding:1rem; border-radius:var(--radius-md); margin-bottom:1.25rem; font-size:0.85rem;">
+          <div><strong style="color:var(--text-muted);">From:</strong> <span id="inspectSender" style="color:white;">-</span></div>
+          <div><strong style="color:var(--text-muted);">To:</strong> <span id="inspectRecipient" style="color:white;">-</span></div>
+          <div><strong style="color:var(--text-muted);">Dispatched At:</strong> <span id="inspectTime" style="color:white;">-</span></div>
+          <div><strong style="color:var(--text-muted);">Spam Score:</strong> <span id="inspectSpamScore" style="color:var(--accent-emerald);">96% Inbox</span></div>
+        </div>
+
+        <div style="margin-bottom:1rem;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.3rem;">
+            <label class="form-label" style="margin:0;">Dispatched Subject Line</label>
+            <span id="inspectAiBadge" class="badge badge-purple" style="display:none;">✨ AI Tailored</span>
+          </div>
+          <div id="inspectSubject" style="background:rgba(10,13,20,0.6); padding:0.75rem 1rem; border-radius:var(--radius-md); border:1px solid var(--border-color); font-weight:600; color:white;">
+            -
+          </div>
+        </div>
+
+        <div style="margin-bottom:1.25rem;">
+          <label class="form-label">Full Dispatched Body Copy</label>
+          <div id="inspectBodyText" style="background:rgba(10,13,20,0.6); padding:1rem; border-radius:var(--radius-md); border:1px solid var(--border-color); white-space:pre-wrap; font-size:0.85rem; color:#cbd5e1; max-height:250px; overflow-y:auto;">
+            -
+          </div>
+        </div>
+
+        <div>
+          <label class="form-label">Attached Collateral Files</label>
+          <div id="inspectAttachmentsList">
+            <!-- Files injected here -->
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn btn-secondary close-modal-trigger">Close Inspector</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Application Logic Modules -->
+  <script src="js/state.js"></script>
+  <script src="js/ai-optimizer.js"></script>
+  <script src="js/spam-auditor.js"></script>
+  <script src="js/sender.js"></script>
+  <script src="js/leads.js"></script>
+  <script src="js/composer-ui.js"></script>
+  <script src="js/spam-auditor-ui.js"></script>
+  <script src="js/dispatcher.js"></script>
+  <script src="js/owner-panel.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
