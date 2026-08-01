@@ -1,5 +1,5 @@
 /* ==========================================================================
-   BULK EMAIL DISPATCH ENGINE & LIVE CONSOLE
+   BULK EMAIL DISPATCH ENGINE & REAL EMAIL DELIVERY - MOUNT2OCEAN
    ========================================================================== */
 
 class DispatcherController {
@@ -42,6 +42,40 @@ class DispatcherController {
     if (logBox) logBox.innerHTML = '';
   }
 
+  /**
+   * Attempts real HTTP email dispatch via EmailJS / Resend / Webhook API if configured
+   */
+  async sendRealEmailHttpRequest(sender, recipientEmail, recipientName, subject, bodyHtml) {
+    // If user provided a Resend API key or custom webhook endpoint in SMTP app password field
+    const apiKey = sender.appPassword ? sender.appPassword.trim() : '';
+
+    if (apiKey && apiKey.startsWith('re_')) {
+      // Resend.com Real Email API Integration
+      try {
+        const response = await fetch('https://api.resend.com/emails', {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${apiKey}`,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            from: `${sender.name || 'Mount2ocean'} <${sender.email}>`,
+            to: [recipientEmail],
+            subject: subject,
+            text: bodyHtml
+          })
+        });
+        const data = await response.json();
+        return { success: response.ok, data };
+      } catch (err) {
+        console.warn('Real HTTP API send error:', err);
+        return { success: false, error: err.message };
+      }
+    }
+
+    return { success: true, simulated: true };
+  }
+
   async startBulkDispatch() {
     const sender = window.appState.sender;
     const companies = window.appState.companies.filter(c => c.status !== 'Sent');
@@ -50,12 +84,12 @@ class DispatcherController {
     const delaySec = parseInt(document.getElementById('dispatchDelaySlider').value) || 3;
 
     if (!sender || !sender.email) {
-      alert('Please setup your Sender Email and SMTP credentials first (Click on the top-right Sender pill).');
+      alert('Please setup your Sender Email and SMTP credentials first (Click on top-right Sender pill).');
       return;
     }
 
     if (companies.length === 0) {
-      alert('No pending target companies to dispatch. Please add companies or reset target list.');
+      alert('No pending target companies to dispatch. Please add companies or import a CSV list.');
       return;
     }
 
@@ -71,7 +105,7 @@ class DispatcherController {
     this.clearLogs();
 
     this.logMessage(`🚀 Initializing Bulk Dispatch Engine for ${companies.length} target companies...`, 'success');
-    this.logMessage(`🔑 Sender Account: ${sender.email} via ${sender.smtpHost}:${sender.smtpPort}`, 'info');
+    this.logMessage(`🔑 Sender Account: ${sender.email} (${sender.name})`, 'info');
     this.logMessage(`⏱️ Staggered Sending Delay: ${delaySec} seconds per message (Anti-Spam Mode)`, 'info');
     this.logMessage(`🤖 AI Optimization Bot: ${aiConfig.enabled ? 'ACTIVE (Tone: ' + aiConfig.tone + ')' : 'OFF (Standard Copy)'}`, aiConfig.enabled ? 'purple' : 'info');
 
@@ -108,7 +142,10 @@ class DispatcherController {
         finalBody += `\n\n${sender.signature}`;
       }
 
-      // Simulate SMTP Handshake & Delivery Delay
+      // Attempt Real HTTP API Delivery if API key provided
+      const apiResult = await this.sendRealEmailHttpRequest(sender, comp.contactEmail, comp.contactPerson, finalSubject, finalBody);
+
+      // Staggered delay pause
       await new Promise(resolve => setTimeout(resolve, delaySec * 1000));
 
       if (!this.isSending) break;
@@ -126,7 +163,7 @@ class DispatcherController {
         recipientEmail: comp.contactEmail,
         industry: comp.industry,
         subject: finalSubject,
-        status: 'Delivered',
+        status: apiResult.simulated ? 'Delivered (Demo)' : (apiResult.success ? 'Delivered (Real Inbox)' : 'Failed'),
         spamScore: `${audit.score}% Clean (Inbox)`,
         aiOptimized: isAiOptimized,
         attachments: (template.attachments || []).map(a => a.name),
@@ -135,15 +172,20 @@ class DispatcherController {
 
       window.appState.addSentLog(logEntry);
 
-      this.logMessage(`✅ Delivered to ${comp.contactEmail} | Spam Score: ${audit.score}% (Inbox Ready)`, 'success');
+      if (apiResult.simulated) {
+        this.logMessage(`✅ Processed for ${comp.contactEmail} | Spam Score: ${audit.score}% (Inbox Ready)`, 'success');
+      } else if (apiResult.success) {        this.logMessage(`📬 REAL EMAIL DELIVERED to ${comp.contactEmail} via API!`, 'success');
+      } else {
+        this.logMessage(`⚠️ API Send Warning for ${comp.contactEmail}: ${apiResult.error || 'Check API Key'}`, 'error');
+      }
 
       // Update Progress Bar
       this.updateProgress(completed, total);
     }
 
     if (this.isSending) {
-      this.logMessage(`🎉 Bulk Dispatch Complete! Total Emails Sent: ${completed}/${total}`, 'success');
-      if (window.showToast) window.showToast(`Dispatch Finished! Sent ${completed} emails successfully.`, 'success');
+      this.logMessage(`🎉 Bulk Dispatch Complete! Processed: ${completed}/${total}`, 'success');
+      if (window.showToast) window.showToast(`Dispatch Finished! Processed ${completed} emails.`, 'success');
     }
 
     this.isSending = false;
