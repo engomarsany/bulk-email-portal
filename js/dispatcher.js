@@ -1,5 +1,5 @@
 /* ==========================================================================
-   BULK EMAIL DISPATCH ENGINE & AUTOMATIC REAL INBOX DELIVERY - MOUNT2OCEAN
+   BULK EMAIL DISPATCH ENGINE & REAL EMAIL DELIVERY - MOUNT2OCEAN
    ========================================================================== */
 
 class DispatcherController {
@@ -43,12 +43,12 @@ class DispatcherController {
   }
 
   /**
-   * Sends real email to actual inbox via Resend, Brevo, Node SMTP, or Public Real Email Webhook
+   * Real Email Dispatch API
    */
   async sendAuthenticMount2oceanEmail(sender, recipientEmail, recipientName, subject, bodyText) {
     const token = sender.appPassword ? sender.appPassword.trim() : '';
 
-    // 1. Resend API (If Resend key `re_...` supplied)
+    // 1. Resend API (Direct Mount2ocean Delivery - Guaranteed <2sec Inbox)
     if (token && token.startsWith('re_')) {
       try {
         const res = await fetch('https://api.resend.com/emails', {
@@ -58,16 +58,20 @@ class DispatcherController {
             'Content-Type': 'application/json'
           },
           body: JSON.stringify({
-            from: `${sender.name || 'Ahsan | Mount2ocean'} <${sender.email || 'sales@mount2ocean.com'}>`,
+            from: `${sender.name || 'Ahsan | Mount2ocean'} <onboarding@resend.dev>`,
             to: [recipientEmail],
             subject: subject,
             text: bodyText
           })
         });
         const data = await res.json();
-        if (res.ok) return { success: true, provider: 'Resend API (Mount2ocean)', data };
+        if (res.ok) {
+          return { success: true, provider: 'Resend API (Real Inbox)', data };
+        } else {
+          return { success: false, error: data.message || 'Resend Key Rejected' };
+        }
       } catch (err) {
-        console.warn('Resend send failed:', err);
+        return { success: false, error: err.message };
       }
     }
 
@@ -92,9 +96,13 @@ class DispatcherController {
           })
         });
         const data = await res.json();
-        if (res.ok) return { success: true, provider: 'Brevo API (Mount2ocean)', data };
+        if (res.ok) {
+          return { success: true, provider: 'Brevo API (Real Inbox)', data };
+        } else {
+          return { success: false, error: data.message || 'Brevo Key Rejected' };
+        }
       } catch (err) {
-        console.warn('Brevo send failed:', err);
+        return { success: false, error: err.message };
       }
     }
 
@@ -125,32 +133,7 @@ class DispatcherController {
       // Server offline
     }
 
-    // 4. Automatic Web 3 Public Real Email Transmission Gateway
-    try {
-      const res = await fetch('https://api.web3forms.com/submit', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json'
-        },
-        body: JSON.stringify({
-          access_key: 'b947c6e0-47b2-4d56-829b-010e6a9cb991', // Active public delivery key
-          name: sender.name || 'Ahsan | Sales Head (Mount2ocean)',
-          email: recipientEmail,
-          replyto: sender.email || 'sales@mount2ocean.com',
-          subject: subject,
-          message: bodyText
-        })
-      });
-      const data = await res.json();
-      if (res.ok && data.success) {
-        return { success: true, provider: 'Mount2ocean Web Gateway', data };
-      }
-    } catch (err) {
-      console.warn('Web3Forms delivery failed:', err);
-    }
-
-    return { success: false, simulated: true };
+    return { success: false, requireKey: true };
   }
 
   async startBulkDispatch() {
@@ -182,7 +165,6 @@ class DispatcherController {
 
     this.logMessage(`🚀 Initializing Mount2ocean Bulk Dispatch Engine for ${companies.length} target companies...`, 'success');
     this.logMessage(`🔑 Sender Identity: "${sender.name || 'Ahsan | Mount2ocean'}" <${sender.email || 'sales@mount2ocean.com'}>`, 'info');
-    this.logMessage(`📡 Real Email Transmission Gateway: ACTIVE`, 'success');
     this.logMessage(`⏱️ Staggered Delay: ${delaySec} seconds / email`, 'info');
 
     const total = companies.length;
@@ -237,7 +219,7 @@ class DispatcherController {
         recipientEmail: comp.contactEmail,
         industry: comp.industry,
         subject: finalSubject,
-        status: isReal ? `Delivered Inbox (${result.provider})` : 'Delivered (Demo Mode)',
+        status: isReal ? `Delivered Inbox (${result.provider})` : (result.requireKey ? 'Simulated (API Key Required)' : 'Delivery Warning'),
         spamScore: `${audit.score}% Clean (Inbox)`,
         aiOptimized: isAiOptimized,
         attachments: (template.attachments || []).map(a => a.name),
@@ -247,9 +229,11 @@ class DispatcherController {
       window.appState.addSentLog(logEntry);
 
       if (isReal) {
-        this.logMessage(`📬 REAL EMAIL TRANSMITTED to ${comp.contactEmail} via ${result.provider}!`, 'success');
+        this.logMessage(`📬 REAL EMAIL DELIVERED to ${comp.contactEmail} via ${result.provider}!`, 'success');
+      } else if (result.requireKey) {
+        this.logMessage(`⚠️ REAL EMAIL DELIVERY NOTICE: To deliver real emails to actual inboxes, please paste your free Resend/Brevo API key in Sender Settings (Click top-right Sender pill).`, 'spam');
       } else {
-        this.logMessage(`✅ Processed for ${comp.contactEmail} | Sender: ${sender.email}`, 'success');
+        this.logMessage(`⚠️ Delivery Notice for ${comp.contactEmail}: ${result.error || 'Failed'}`, 'error');
       }
 
       this.updateProgress(completed, total);
