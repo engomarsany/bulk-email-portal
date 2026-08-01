@@ -1,32 +1,32 @@
 /* ==========================================================================
-   AI EMAIL OPTIMIZER BOT ENGINE - MOUNT2OCEAN
+   AI EMAIL OPTIMIZER BOT ENGINE - MOUNT2OCEAN (ROBUST FUZZY INDUSTRY MATCHING)
    ========================================================================== */
 
 const INDUSTRY_AI_PROMPTS = {
-  FinTech: {
-    hook: "In the fast-moving financial technology ecosystem, securing data pipelines and ensuring automated compliance is paramount.",
-    valueProp: "Mount2ocean provides high-performance data architecture that slashes operational processing overhead by up to 45%.",
-    cta: "Can we schedule a 10-minute executive briefing on financial automation?"
+  Travels: {
+    hook: "In the dynamic travel, tourism, and hospitality sector, seamless booking experiences, personalized itineraries, and partner logistics drive customer loyalty.",
+    valueProp: "Mount2ocean provides high-efficiency travel automation and partner management frameworks to optimize booking throughput.",
+    cta: "Would you be open for a brief 10-minute chat on scaling travel & hospitality operations?"
+  },
+  Medical: {
+    hook: "Medical institutions, hospitals, and healthcare providers demand absolute accuracy, regulatory compliance, and seamless patient coordination.",
+    valueProp: "Mount2ocean provides medical-grade operational frameworks that streamline patient care workflows and hospital administration.",
+    cta: "Can we schedule a 10-minute briefing on medical & hospital workflow automation?"
   },
   Healthcare: {
     hook: "With strict compliance guidelines and patient care demands, healthcare organizations require rock-solid operational reliability.",
     valueProp: "Mount2ocean delivers HIPAA-verified workflow orchestration that simplifies patient data management and admin workloads.",
     cta: "Would you be open to reviewing our healthcare automation case study?"
   },
-  Medical: {
-    hook: "Medical institutions and pharmaceutical providers demand absolute accuracy, regulatory compliance, and seamless patient data coordination.",
-    valueProp: "Mount2ocean provides medical-grade operational frameworks that streamline patient care workflows and record synchronization.",
-    cta: "Can we schedule a 10-minute briefing on medical workflow automation?"
-  },
-  Travels: {
-    hook: "In the dynamic travel, tourism, and hospitality sector, seamless booking experiences and partner logistics drive customer loyalty.",
-    valueProp: "Mount2ocean provides high-efficiency travel automation and partner management frameworks to optimize booking throughput.",
-    cta: "Would you be open for a brief 10-minute chat on scaling travel operations?"
-  },
   B2B: {
     hook: "Scaling B2B enterprise partnerships requires high-touch relationship management, streamlined procurement, and predictable revenue pipelines.",
     valueProp: "Mount2ocean offers specialized B2B outreach and partner automation frameworks designed to accelerate enterprise sales cycles.",
     cta: "Would you have 10 minutes next week for an exploratory B2B discussion?"
+  },
+  FinTech: {
+    hook: "In the fast-moving financial technology ecosystem, securing data pipelines and ensuring automated compliance is paramount.",
+    valueProp: "Mount2ocean provides high-performance data architecture that slashes operational processing overhead by up to 45%.",
+    cta: "Can we schedule a 10-minute executive briefing on financial automation?"
   },
   SaaS: {
     hook: "Scaling SaaS products efficiently requires low churn, automated user onboarding, and seamless integration infrastructure.",
@@ -60,20 +60,58 @@ class AIOptimizerBot {
     this.name = 'Mount2ocean AI Outreach Bot';
   }
 
+  /**
+   * Fuzzy industry key resolver
+   */
+  resolveIndustryKey(industryInput = '') {
+    if (!industryInput) return 'General';
+    const str = industryInput.toLowerCase();
+
+    if (str.includes('travel') || str.includes('tourism') || str.includes('hotel') || str.includes('hospitality')) {
+      return 'Travels';
+    }
+    if (str.includes('medic') || str.includes('hospital') || str.includes('pharma') || str.includes('clinic')) {
+      return 'Medical';
+    }
+    if (str.includes('health') || str.includes('bio')) {
+      return 'Healthcare';
+    }
+    if (str.includes('b2b') || str.includes('enterprise') || str.includes('corporate')) {
+      return 'B2B';
+    }
+    if (str.includes('fin') || str.includes('bank') || str.includes('pay')) {
+      return 'FinTech';
+    }
+    if (str.includes('saas') || str.includes('cloud') || str.includes('soft')) {
+      return 'SaaS';
+    }
+    if (str.includes('logist') || str.includes('supply') || str.includes('ship')) {
+      return 'Logistics';
+    }
+    if (str.includes('commerce') || str.includes('shop') || str.includes('retail')) {
+      return 'E-Commerce';
+    }
+    if (str.includes('manufactur') || str.includes('factory') || str.includes('iot')) {
+      return 'Manufacturing';
+    }
+
+    return INDUSTRY_AI_PROMPTS[industryInput] ? industryInput : 'General';
+  }
+
   optimizeEmail(company, baseTemplate, senderInfo, tone = 'Consultative') {
-    const industryKey = INDUSTRY_AI_PROMPTS[company.industry] ? company.industry : 'General';
-    const aiKnowledge = INDUSTRY_AI_PROMPTS[industryKey];
+    const industryKey = this.resolveIndustryKey(company.industry);
+    const aiKnowledge = INDUSTRY_AI_PROMPTS[industryKey] || INDUSTRY_AI_PROMPTS['General'];
 
     let optimizedSubject = baseTemplate.subject;
     if (optimizedSubject.includes('{{company_name}}')) {
       optimizedSubject = optimizedSubject.replace(/\{\{company_name\}\}/g, company.name);
     }
     if (optimizedSubject.includes('{{industry}}')) {
-      optimizedSubject = optimizedSubject.replace(/\{\{industry\}\}/g, company.industry);
+      optimizedSubject = optimizedSubject.replace(/\{\{industry\}\}/g, company.industry || industryKey);
     }
 
     const subjectPrefixes = {
-      Consultative: `[Insight] Scaling ${company.name}'s ${company.industry} Operations`,
+      Consultative: `[Insight] Scaling ${company.name}'s ${company.industry || industryKey} Operations`,
       Persuasive: `Strategic Growth Solution for ${company.name}`,
       Friendly: `Quick Idea for ${company.contactPerson || company.name}`,
       Professional: `Business Collaboration Proposal - ${company.name}`
@@ -87,10 +125,10 @@ class AIOptimizerBot {
 
     body = body.replace(/\{\{company_name\}\}/g, company.name || 'your company');
     body = body.replace(/\{\{contact_person\}\}/g, company.contactPerson || 'Team');
-    body = body.replace(/\{\{industry\}\}/g, company.industry || 'industry');
+    body = body.replace(/\{\{industry\}\}/g, company.industry || industryKey);
     body = body.replace(/\{\{sender_name\}\}/g, senderInfo.name || 'Ahsan | Sales Head');
 
-    const finalBody = `Hi ${company.contactPerson || 'Team'},\n\n${aiKnowledge.hook}\n\nAt Mount2ocean, ${aiKnowledge.valueProp.toLowerCase()}\n\nGiven your leadership at ${company.name} in the ${company.industry} space, I attached our complete company profile for your review.\n\n${aiKnowledge.cta}\n\nBest regards,\n${senderInfo.name || 'Ahsan | Sales Head'}\n${senderInfo.email || 'sales@mount2ocean.com'}`;
+    const finalBody = `Hi ${company.contactPerson || 'Team'},\n\n${aiKnowledge.hook}\n\nAt Mount2ocean, ${aiKnowledge.valueProp.toLowerCase()}\n\nGiven your leadership at ${company.name} in the ${company.industry || industryKey} space, I attached our complete company profile for your review.\n\n${aiKnowledge.cta}\n\nBest regards,\n${senderInfo.name || 'Ahsan | Sales Head'}\n${senderInfo.email || 'sales@mount2ocean.com'}`;
 
     return {
       subject: optimizedSubject,
