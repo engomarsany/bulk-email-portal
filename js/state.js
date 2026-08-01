@@ -1,5 +1,5 @@
 /* ==========================================================================
-   STATE & DATA ENGINE - MOUNT2OCEAN BULK EMAIL PORTAL
+   STATE & DATA ENGINE - MOUNT2OCEAN BULK EMAIL PORTAL (20K DAILY CAPACITY)
    ========================================================================== */
 
 const STORAGE_KEYS = {
@@ -23,7 +23,7 @@ const DEFAULT_SENDER = {
   isLoggedIn: true
 };
 
-// Empty Production Target List (Ready for CSV Import or Manual Add)
+// Production Target List
 const DEFAULT_COMPANIES = [];
 
 // Mount2ocean Official Outreach Email Template
@@ -48,27 +48,26 @@ If you prefer not to receive future updates, you can [Unsubscribe Here] anytime.
 };
 
 const DEFAULT_AI_CONFIG = {
-  enabled: true, // AI Bot switch enabled by default
+  enabled: true,
   tone: 'Consultative',
   creativity: 'High',
   autoPersonalize: true
 };
 
-// Empty Production Sent Logs History
 const DEFAULT_SENT_LOGS = [];
 
+// Owner System Settings Configured for 20,000 Emails/Day High Capacity
 const DEFAULT_OWNER_SETTINGS = {
-  maxDailyEmails: 2500,
-  staggerDelaySeconds: 4,
+  maxDailyEmails: 20000, // 20,000 Emails Per Day Limit
+  staggerDelaySeconds: 2,
   strictSpamThreshold: 85,
   requireUnsubscribeHeader: true,
-  domainReputationStatus: 'Verified (Mount2ocean)',
+  domainReputationStatus: 'Verified High Capacity (Mount2ocean)',
   spfStatus: 'Verified (v=spf1 include:mount2ocean.com ~all)',
   dkimStatus: 'Verified (Mount2ocean 2048-bit RSA)',
   dmarcStatus: 'Verified (p=reject; rua=mailto:dmarc@mount2ocean.com)'
 };
 
-// Global App State Wrapper
 class AppState {
   constructor() {
     this.sender = this.load(STORAGE_KEYS.SENDER, DEFAULT_SENDER);
@@ -77,6 +76,12 @@ class AppState {
     this.aiConfig = this.load(STORAGE_KEYS.AI_CONFIG, DEFAULT_AI_CONFIG);
     this.sentLogs = this.load(STORAGE_KEYS.SENT_LOGS, DEFAULT_SENT_LOGS);
     this.ownerSettings = this.load(STORAGE_KEYS.OWNER_SETTINGS, DEFAULT_OWNER_SETTINGS);
+
+    // Enforce 20,000 daily capacity limit
+    if (this.ownerSettings.maxDailyEmails < 20000) {
+      this.ownerSettings.maxDailyEmails = 20000;
+      this.save(STORAGE_KEYS.OWNER_SETTINGS, this.ownerSettings);
+    }
   }
 
   load(key, fallback) {
