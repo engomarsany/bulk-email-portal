@@ -9,9 +9,24 @@ const INDUSTRY_AI_PROMPTS = {
     cta: "Can we schedule a 10-minute executive briefing on financial automation?"
   },
   Healthcare: {
-    hook: "With strict HIPAA guidelines and patient care demands, healthcare organizations require rock-solid operational reliability.",
+    hook: "With strict compliance guidelines and patient care demands, healthcare organizations require rock-solid operational reliability.",
     valueProp: "Mount2ocean delivers HIPAA-verified workflow orchestration that simplifies patient data management and admin workloads.",
     cta: "Would you be open to reviewing our healthcare automation case study?"
+  },
+  Medical: {
+    hook: "Medical institutions and pharmaceutical providers demand absolute accuracy, regulatory compliance, and seamless patient data coordination.",
+    valueProp: "Mount2ocean provides medical-grade operational frameworks that streamline patient care workflows and record synchronization.",
+    cta: "Can we schedule a 10-minute briefing on medical workflow automation?"
+  },
+  Travels: {
+    hook: "In the dynamic travel, tourism, and hospitality sector, seamless booking experiences and partner logistics drive customer loyalty.",
+    valueProp: "Mount2ocean provides high-efficiency travel automation and partner management frameworks to optimize booking throughput.",
+    cta: "Would you be open for a brief 10-minute chat on scaling travel operations?"
+  },
+  B2B: {
+    hook: "Scaling B2B enterprise partnerships requires high-touch relationship management, streamlined procurement, and predictable revenue pipelines.",
+    valueProp: "Mount2ocean offers specialized B2B outreach and partner automation frameworks designed to accelerate enterprise sales cycles.",
+    cta: "Would you have 10 minutes next week for an exploratory B2B discussion?"
   },
   SaaS: {
     hook: "Scaling SaaS products efficiently requires low churn, automated user onboarding, and seamless integration infrastructure.",
