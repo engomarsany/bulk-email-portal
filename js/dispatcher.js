@@ -1,5 +1,5 @@
 /* ==========================================================================
-   BULK EMAIL DISPATCH ENGINE & AUTOMATIC REAL EMAIL DELIVERY - MOUNT2OCEAN
+   BULK EMAIL DISPATCH ENGINE & AUTHENTIC SENDER DELIVERY - MOUNT2OCEAN
    ========================================================================== */
 
 class DispatcherController {
@@ -43,12 +43,12 @@ class DispatcherController {
   }
 
   /**
-   * Automatic Real Email Dispatch via Direct Cloud API / Relay / Webhook
+   * Sends authentic email strictly as Mount2ocean sender identity
    */
-  async sendRealEmailAuto(sender, recipientEmail, recipientName, subject, bodyText) {
+  async sendAuthenticMount2oceanEmail(sender, recipientEmail, recipientName, subject, bodyText) {
     const token = sender.appPassword ? sender.appPassword.trim() : '';
 
-    // 1. Try Resend.com API if Resend key is supplied
+    // 1. Resend API (Direct Mount2ocean Sender Display)
     if (token && token.startsWith('re_')) {
       try {
         const res = await fetch('https://api.resend.com/emails', {
@@ -58,26 +58,59 @@ class DispatcherController {
             'Content-Type': 'application/json'
           },
           body: JSON.stringify({
-            from: `${sender.name || 'Mount2ocean'} <onboarding@resend.dev>`,
+            from: `${sender.name || 'Ahsan | Mount2ocean'} <${sender.email || 'sales@mount2ocean.com'}>`,
             to: [recipientEmail],
             subject: subject,
             text: bodyText
           })
         });
         const data = await res.json();
-        return { success: res.ok, provider: 'Resend Cloud API', data };
+        return { success: res.ok, provider: 'Resend (Mount2ocean)', data };
       } catch (err) {
         console.warn('Resend send failed:', err);
       }
     }
 
-    // 2. Try Local / VPS Node.js SMTP Backend Server if available
+    // 2. Brevo API (Direct Mount2ocean Sender Display)
+    if (token && token.startsWith('xkeysib-')) {
+      try {
+        const res = await fetch('https://api.brevo.com/v3/smtp/email', {
+          method: 'POST',
+          headers: {
+            'api-key': token,
+            'Content-Type': 'application/json',
+            'Accept': 'application/json'
+          },
+          body: JSON.stringify({
+            sender: {
+              name: sender.name || 'Ahsan | Mount2ocean',
+              email: sender.email || 'sales@mount2ocean.com'
+            },
+            to: [{ email: recipientEmail, name: recipientName || '' }],
+            subject: subject,
+            textContent: bodyText
+          })
+        });
+        const data = await res.json();
+        return { success: res.ok, provider: 'Brevo (Mount2ocean)', data };
+      } catch (err) {
+        console.warn('Brevo send failed:', err);
+      }
+    }
+
+    // 3. Local / Server Node.js Express SMTP Transporter
     try {
       const res = await fetch(this.backendUrl, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          sender,
+          sender: {
+            name: sender.name || 'Ahsan | Mount2ocean',
+            email: sender.email || 'sales@mount2ocean.com',
+            smtpHost: sender.smtpHost || 'mail.mount2ocean.com',
+            smtpPort: sender.smtpPort || 587,
+            appPassword: token
+          },
           recipientEmail,
           recipientName,
           subject,
@@ -86,34 +119,10 @@ class DispatcherController {
       });
       if (res.ok) {
         const data = await res.json();
-        return { success: true, provider: 'Node.js SMTP Backend', data };
+        return { success: true, provider: 'Mount2ocean Direct SMTP', data };
       }
     } catch (err) {
-      // Local server offline, continue to fallback
-    }
-
-    // 3. Fallback to Cloud Email Webhook Relay
-    try {
-      const formUrl = `https://formsubmit.co/ajax/${encodeURIComponent(recipientEmail)}`;
-      const res = await fetch(formUrl, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json'
-        },
-        body: JSON.stringify({
-          name: sender.name || 'Ahsan | Sales Head (Mount2ocean)',
-          email: sender.email || 'sales@mount2ocean.com',
-          _subject: subject,
-          message: bodyText
-        })
-      });
-      const data = await res.json();
-      if (res.ok) {
-        return { success: true, provider: 'Cloud Relay Gateway', data };
-      }
-    } catch (err) {
-      console.warn('Cloud Relay Gateway send failed:', err);
+      // Server offline
     }
 
     return { success: false, simulated: true };
@@ -146,9 +155,8 @@ class DispatcherController {
     this.toggleSendingUI(true);
     this.clearLogs();
 
-    this.logMessage(`🚀 Initializing Automatic Bulk Dispatch for ${companies.length} target companies...`, 'success');
-    this.logMessage(`🔑 Sender Identity: ${sender.email} (${sender.name})`, 'info');
-    this.logMessage(`⚡ Automatic Real Email Delivery Gateway: ACTIVE`, 'success');
+    this.logMessage(`🚀 Initializing Mount2ocean Bulk Dispatch Engine for ${companies.length} target companies...`, 'success');
+    this.logMessage(`🔑 Sender Identity: "${sender.name || 'Ahsan | Mount2ocean'}" <${sender.email || 'sales@mount2ocean.com'}>`, 'info');
     this.logMessage(`⏱️ Staggered Delay: ${delaySec} seconds / email`, 'info');
 
     const total = companies.length;
@@ -182,8 +190,8 @@ class DispatcherController {
         finalBody += `\n\n${sender.signature}`;
       }
 
-      // Execute Automatic Real Email Dispatch
-      const result = await this.sendRealEmailAuto(sender, comp.contactEmail, comp.contactPerson, finalSubject, finalBody);
+      // Execute Authentic Dispatch (No FormSubmit)
+      const result = await this.sendAuthenticMount2oceanEmail(sender, comp.contactEmail, comp.contactPerson, finalSubject, finalBody);
 
       // Staggered delay pause
       await new Promise(resolve => setTimeout(resolve, delaySec * 1000));
@@ -198,12 +206,12 @@ class DispatcherController {
       const logEntry = {
         id: `LOG-${Math.floor(1000 + Math.random() * 9000)}`,
         timestamp: new Date().toLocaleString(),
-        senderEmail: sender.email,
+        senderEmail: sender.email || 'sales@mount2ocean.com',
         recipientCompany: comp.name,
         recipientEmail: comp.contactEmail,
         industry: comp.industry,
         subject: finalSubject,
-        status: isReal ? `Delivered Real Inbox (${result.provider || 'Gateway'})` : 'Delivered (Demo Mode)',
+        status: isReal ? `Delivered Inbox (${result.provider})` : 'Delivered (Demo Mode)',
         spamScore: `${audit.score}% Clean (Inbox)`,
         aiOptimized: isAiOptimized,
         attachments: (template.attachments || []).map(a => a.name),
@@ -213,9 +221,9 @@ class DispatcherController {
       window.appState.addSentLog(logEntry);
 
       if (isReal) {
-        this.logMessage(`📬 REAL EMAIL DELIVERED to ${comp.contactEmail} via ${result.provider}!`, 'success');
+        this.logMessage(`📬 DELIVERED to ${comp.contactEmail} from "${sender.name}" <${sender.email}>!`, 'success');
       } else {
-        this.logMessage(`✅ Delivered to ${comp.contactEmail} | Spam Score: ${audit.score}%`, 'success');
+        this.logMessage(`✅ Processed for ${comp.contactEmail} | Sender: ${sender.email}`, 'success');
       }
 
       this.updateProgress(completed, total);
