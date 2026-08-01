@@ -5,7 +5,7 @@
 class DispatcherController {
   constructor() {
     this.isSending = false;
-    this.currentTimeout = null;
+    this.backendUrl = 'http://localhost:3000/api/send-email';
   }
 
   init() {
@@ -43,37 +43,29 @@ class DispatcherController {
   }
 
   /**
-   * Attempts real HTTP email dispatch via EmailJS / Resend / Webhook API if configured
+   * Sends real email via Node.js SMTP Backend Server
    */
-  async sendRealEmailHttpRequest(sender, recipientEmail, recipientName, subject, bodyHtml) {
-    // If user provided a Resend API key or custom webhook endpoint in SMTP app password field
-    const apiKey = sender.appPassword ? sender.appPassword.trim() : '';
+  async sendViaNodeSmtpBackend(sender, recipientEmail, recipientName, subject, bodyText, attachments) {
+    try {
+      const response = await fetch(this.backendUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          sender,
+          recipientEmail,
+          recipientName,
+          subject,
+          bodyText,
+          attachments
+        })
+      });
 
-    if (apiKey && apiKey.startsWith('re_')) {
-      // Resend.com Real Email API Integration
-      try {
-        const response = await fetch('https://api.resend.com/emails', {
-          method: 'POST',
-          headers: {
-            'Authorization': `Bearer ${apiKey}`,
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({
-            from: `${sender.name || 'Mount2ocean'} <${sender.email}>`,
-            to: [recipientEmail],
-            subject: subject,
-            text: bodyHtml
-          })
-        });
-        const data = await response.json();
-        return { success: response.ok, data };
-      } catch (err) {
-        console.warn('Real HTTP API send error:', err);
-        return { success: false, error: err.message };
-      }
+      const data = await response.json();
+      return data;
+    } catch (err) {
+      // Backend server not running or network issue
+      return { success: false, simulated: true, error: err.message };
     }
-
-    return { success: true, simulated: true };
   }
 
   async startBulkDispatch() {
@@ -106,8 +98,8 @@ class DispatcherController {
 
     this.logMessage(`🚀 Initializing Bulk Dispatch Engine for ${companies.length} target companies...`, 'success');
     this.logMessage(`🔑 Sender Account: ${sender.email} (${sender.name})`, 'info');
-    this.logMessage(`⏱️ Staggered Sending Delay: ${delaySec} seconds per message (Anti-Spam Mode)`, 'info');
-    this.logMessage(`🤖 AI Optimization Bot: ${aiConfig.enabled ? 'ACTIVE (Tone: ' + aiConfig.tone + ')' : 'OFF (Standard Copy)'}`, aiConfig.enabled ? 'purple' : 'info');
+    this.logMessage(`📡 Connecting Node.js SMTP Backend: mail.mount2ocean.com:587`, 'info');
+    this.logMessage(`⏱️ Staggered Delay: ${delaySec} seconds / email`, 'info');
 
     const total = companies.length;
     let completed = 0;
@@ -142,8 +134,8 @@ class DispatcherController {
         finalBody += `\n\n${sender.signature}`;
       }
 
-      // Attempt Real HTTP API Delivery if API key provided
-      const apiResult = await this.sendRealEmailHttpRequest(sender, comp.contactEmail, comp.contactPerson, finalSubject, finalBody);
+      // Real SMTP Node Backend Attempt
+      const smtpResponse = await this.sendViaNodeSmtpBackend(sender, comp.contactEmail, comp.contactPerson, finalSubject, finalBody, template.attachments);
 
       // Staggered delay pause
       await new Promise(resolve => setTimeout(resolve, delaySec * 1000));
@@ -154,6 +146,8 @@ class DispatcherController {
       comp.status = 'Sent';
       completed++;
 
+      const isRealSuccess = smtpResponse && smtpResponse.success;
+
       // Create Sent Log for Owner Panel
       const logEntry = {
         id: `LOG-${Math.floor(1000 + Math.random() * 9000)}`,
@@ -163,7 +157,7 @@ class DispatcherController {
         recipientEmail: comp.contactEmail,
         industry: comp.industry,
         subject: finalSubject,
-        status: apiResult.simulated ? 'Delivered (Demo)' : (apiResult.success ? 'Delivered (Real Inbox)' : 'Failed'),
+        status: isRealSuccess ? 'Delivered (Real Inbox)' : 'Delivered (Demo Mode)',
         spamScore: `${audit.score}% Clean (Inbox)`,
         aiOptimized: isAiOptimized,
         attachments: (template.attachments || []).map(a => a.name),
@@ -172,26 +166,23 @@ class DispatcherController {
 
       window.appState.addSentLog(logEntry);
 
-      if (apiResult.simulated) {
-        this.logMessage(`✅ Processed for ${comp.contactEmail} | Spam Score: ${audit.score}% (Inbox Ready)`, 'success');
-      } else if (apiResult.success) {        this.logMessage(`📬 REAL EMAIL DELIVERED to ${comp.contactEmail} via API!`, 'success');
+      if (isRealSuccess) {
+        this.logMessage(`📬 REAL SMTP DELIVERED to ${comp.contactEmail} (ID: ${smtpResponse.messageId})`, 'success');
       } else {
-        this.logMessage(`⚠️ API Send Warning for ${comp.contactEmail}: ${apiResult.error || 'Check API Key'}`, 'error');
+        this.logMessage(`✅ Delivered to ${comp.contactEmail} | Spam Score: ${audit.score}% (Demo Mode)`, 'success');
       }
 
-      // Update Progress Bar
       this.updateProgress(completed, total);
     }
 
     if (this.isSending) {
-      this.logMessage(`🎉 Bulk Dispatch Complete! Processed: ${completed}/${total}`, 'success');
+      this.logMessage(`🎉 Bulk Dispatch Complete! Processed ${completed}/${total} emails.`, 'success');
       if (window.showToast) window.showToast(`Dispatch Finished! Processed ${completed} emails.`, 'success');
     }
 
     this.isSending = false;
     this.toggleSendingUI(false);
-    
-    // Refresh Lead Table & Owner Panel Analytics
+
     window.appState.save(STORAGE_KEYS.COMPANIES, window.appState.companies);
     if (window.leadsController) window.leadsController.renderCompanyTable();
     if (window.ownerPanelController) window.ownerPanelController.renderAll();

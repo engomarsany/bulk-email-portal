@@ -1,0 +1,17 @@
+{
+  "name": "bulk-email-portal",
+  "version": "1.0.0",
+  "description": "Mount2ocean Bulk Email Marketing & Outreach Portal with Node.js SMTP Backend",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.19.2",
+    "nodemailer": "^6.9.13"
+  },
+  "author": "Mount2ocean",
+  "license": "MIT"
+}
