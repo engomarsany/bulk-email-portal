@@ -1,63 +1,54 @@
 /* ==========================================================================
-   AI EMAIL OPTIMIZER BOT ENGINE (GEMINI-POWERED AI ASSISTANT)
+   AI EMAIL OPTIMIZER BOT ENGINE - MOUNT2OCEAN
    ========================================================================== */
 
 const INDUSTRY_AI_PROMPTS = {
   FinTech: {
     hook: "In the fast-moving financial technology ecosystem, securing data pipelines and ensuring automated compliance is paramount.",
-    valueProp: "Our enterprise automation architecture integrates directly with high-frequency transaction systems to slash manual verification overhead by 48%.",
-    cta: "Can we schedule a 10-minute executive briefing on financial compliance automation?"
+    valueProp: "Mount2ocean provides high-performance data architecture that slashes operational processing overhead by up to 45%.",
+    cta: "Can we schedule a 10-minute executive briefing on financial automation?"
   },
   Healthcare: {
     hook: "With strict HIPAA guidelines and patient care demands, healthcare organizations require rock-solid operational reliability.",
-    valueProp: "ApexTech provides HIPAA-verified workflow orchestration that simplifies patient telemetry, record syncing, and admin workloads.",
-    cta: "Would you be open to reviewing our HIPAA security whitepaper and scheduling a quick chat?"
+    valueProp: "Mount2ocean delivers HIPAA-verified workflow orchestration that simplifies patient data management and admin workloads.",
+    cta: "Would you be open to reviewing our healthcare automation case study?"
   },
   SaaS: {
     hook: "Scaling SaaS products efficiently requires low churn, automated user onboarding, and seamless integration infrastructure.",
-    valueProp: "We help software leaders optimize cloud infrastructure costs and scale API throughput with zero downtime.",
-    cta: "Are you free for a quick 10-minute demo on SaaS cloud optimization next week?"
+    valueProp: "We help software leaders optimize infrastructure throughput and scale API operations effortlessly.",
+    cta: "Are you free for a quick 10-minute demo next week?"
   },
   Logistics: {
     hook: "Supply chain visibility and real-time fleet intelligence are make-or-break factors for modern logistics leaders.",
-    valueProp: "Our logistics engine provides real-time route optimization, shipment tracking, and automated dispatch management.",
-    cta: "Let's connect for 10 minutes to discuss how we can optimize your shipment throughput."
+    valueProp: "Mount2ocean's logistics suite provides real-time route optimization and automated dispatch management.",
+    cta: "Let's connect for 10 minutes to discuss optimizing your shipment throughput."
   },
   'E-Commerce': {
-    hook: "Customer acquisition costs are climbing, making cart conversion and personalized retargeting crucial for retail growth.",
-    valueProp: "ApexTech automates high-speed checkout flows, inventory synchronization, and post-purchase customer journeys.",
-    cta: "Can I show you a 3-minute video breakdown of our e-commerce conversion framework?"
+    hook: "Customer acquisition costs are climbing, making conversion rates and inventory synchronization crucial for retail growth.",
+    valueProp: "Mount2ocean automates high-speed checkout journeys and post-purchase customer automation.",
+    cta: "Can I share a brief breakdown of our e-commerce framework?"
   },
   Manufacturing: {
     hook: "Industry 4.0 demands smart factory telemetry, predictive maintenance, and zero-defect quality control.",
-    valueProp: "Our IoT integration platform connects shop-floor equipment with ERP systems for real-time operational visibility.",
-    cta: "Would you be interested in a brief call to explore factory automation benchmarks?"
+    valueProp: "Mount2ocean connects shop-floor telemetry with core management systems for real-time operational visibility.",
+    cta: "Would you be interested in exploring factory automation benchmarks?"
   },
   General: {
-    hook: "Modern enterprises face increasing pressure to streamline operations while accelerating revenue growth.",
-    valueProp: "Our scalable digital solutions automate core workflows and reduce operational friction across departments.",
+    hook: "Modern enterprises face increasing pressure to streamline operations while accelerating growth.",
+    valueProp: "Mount2ocean delivers digital solutions that automate core workflows and eliminate operational friction.",
     cta: "Would you have 10 minutes next Tuesday for a brief exploratory discussion?"
   }
 };
 
 class AIOptimizerBot {
   constructor() {
-    this.name = 'Gemini Outreach Bot v4.2';
+    this.name = 'Mount2ocean AI Outreach Bot';
   }
 
-  /**
-   * Generates tailored email subject and body for a target company
-   * @param {Object} company - Target company info {name, industry, contactPerson}
-   * @param {Object} baseTemplate - Original email template {subject, body}
-   * @param {Object} senderInfo - Sender info {name, email}
-   * @param {string} tone - Selected AI tone ('Consultative', 'Persuasive', 'Friendly', 'Professional')
-   * @returns {Object} Optimized {subject, body, industryHook, confidenceScore}
-   */
   optimizeEmail(company, baseTemplate, senderInfo, tone = 'Consultative') {
     const industryKey = INDUSTRY_AI_PROMPTS[company.industry] ? company.industry : 'General';
     const aiKnowledge = INDUSTRY_AI_PROMPTS[industryKey];
 
-    // Subject Line Optimization
     let optimizedSubject = baseTemplate.subject;
     if (optimizedSubject.includes('{{company_name}}')) {
       optimizedSubject = optimizedSubject.replace(/\{\{company_name\}\}/g, company.name);
@@ -66,32 +57,25 @@ class AIOptimizerBot {
       optimizedSubject = optimizedSubject.replace(/\{\{industry\}\}/g, company.industry);
     }
 
-    // Add Industry AI Flair to Subject if needed
     const subjectPrefixes = {
       Consultative: `[Insight] Scaling ${company.name}'s ${company.industry} Operations`,
-      Persuasive: `Achieving 40%+ Efficiency Gains for ${company.name}`,
+      Persuasive: `Strategic Growth Solution for ${company.name}`,
       Friendly: `Quick Idea for ${company.contactPerson || company.name}`,
-      Professional: `Growth & Automation Strategy for ${company.name}`
+      Professional: `Business Collaboration Proposal - ${company.name}`
     };
 
     if (tone && subjectPrefixes[tone]) {
       optimizedSubject = subjectPrefixes[tone];
     }
 
-    // Body Personalization & Rewriting
     let body = baseTemplate.body || '';
 
-    // Replace basic tokens first
     body = body.replace(/\{\{company_name\}\}/g, company.name || 'your company');
     body = body.replace(/\{\{contact_person\}\}/g, company.contactPerson || 'Team');
     body = body.replace(/\{\{industry\}\}/g, company.industry || 'industry');
-    body = body.replace(/\{\{sender_name\}\}/g, senderInfo.name || 'Sales Team');
+    body = body.replace(/\{\{sender_name\}\}/g, senderInfo.name || 'Ahsan | Sales Head');
 
-    // AI Dynamic Industry Hook Insertion
-    const aiHookSection = `\n\n💡 AI Industry Insight for ${company.name}:\n${aiKnowledge.hook}\n${aiKnowledge.valueProp}`;
-    
-    // Construct final optimized body
-    const finalBody = `Hi ${company.contactPerson || 'Team'},\n\n${aiKnowledge.hook}\n\nAt ApexTech, ${aiKnowledge.valueProp.toLowerCase()}\n\nGiven your leadership at ${company.name} in the ${company.industry} space, I attached our complete solution guide and case study for your review.\n\n${aiKnowledge.cta}\n\nBest regards,\n${senderInfo.name || 'Alex Rivera'}\n${senderInfo.email || ''}`;
+    const finalBody = `Hi ${company.contactPerson || 'Team'},\n\n${aiKnowledge.hook}\n\nAt Mount2ocean, ${aiKnowledge.valueProp.toLowerCase()}\n\nGiven your leadership at ${company.name} in the ${company.industry} space, I attached our complete company profile for your review.\n\n${aiKnowledge.cta}\n\nBest regards,\n${senderInfo.name || 'Ahsan | Sales Head'}\n${senderInfo.email || 'sales@mount2ocean.com'}`;
 
     return {
       subject: optimizedSubject,
@@ -103,9 +87,6 @@ class AIOptimizerBot {
     };
   }
 
-  /**
-   * Generates a live side-by-side comparison for modal preview
-   */
   generatePreviewComparison(company, baseTemplate, senderInfo, tone) {
     const original = {
       subject: baseTemplate.subject.replace(/\{\{company_name\}\}/g, company.name).replace(/\{\{industry\}\}/g, company.industry),

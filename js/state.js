@@ -1,5 +1,5 @@
 /* ==========================================================================
-   STATE & DATA ENGINE - BULK EMAIL PORTAL
+   STATE & DATA ENGINE - MOUNT2OCEAN BULK EMAIL PORTAL
    ========================================================================== */
 
 const STORAGE_KEYS = {
@@ -12,95 +12,60 @@ const STORAGE_KEYS = {
   OWNER_SETTINGS: 'bulk_portal_owner_settings'
 };
 
-// Initial Sample Data for Quick Test & Out-of-Box Functionality
+// Official Mount2ocean Sender Identity
 const DEFAULT_SENDER = {
-  email: 'alex.marketing@apextech.com',
-  name: 'Alex Rivera (Growth Lead)',
-  smtpHost: 'smtp.apextech.com',
+  email: 'sales@mount2ocean.com',
+  name: 'Ahsan | Sales Head',
+  smtpHost: 'mail.mount2ocean.com',
   smtpPort: 587,
-  appPassword: '••••••••••••••••',
-  signature: 'Best regards,\nAlex Rivera | Head of Business Outreach\nApexTech Solutions Inc.\nWeb: https://apextech.com | Tel: +1 (800) 555-0199',
+  appPassword: '',
+  signature: 'Best regards,\nAhsan | Sales Head\nMount2ocean\nWebsite: https://mount2ocean.com | Tel: +880 1977-477172',
   isLoggedIn: true
 };
 
-const DEFAULT_COMPANIES = [
-  { id: 1, name: 'Nexus Financial Systems', industry: 'FinTech', contactEmail: 'contact@nexusfin.com', contactPerson: 'Sarah Jenkins', status: 'Pending', website: 'https://nexusfin.com' },
-  { id: 2, name: 'CarePulse HealthTech', industry: 'Healthcare', contactEmail: 'info@carepulsehealth.org', contactPerson: 'Dr. Robert Miller', status: 'Pending', website: 'https://carepulsehealth.org' },
-  { id: 3, name: 'Vortex Cloud Solutions', industry: 'SaaS', contactEmail: 'outreach@vortexcloud.io', contactPerson: 'Marcus Vance', status: 'Pending', website: 'https://vortexcloud.io' },
-  { id: 4, name: 'OmniTrade Global Logistics', industry: 'Logistics', contactEmail: 'sales@omnitradeglobal.com', contactPerson: 'Elena Rostova', status: 'Pending', website: 'https://omnitradeglobal.com' },
-  { id: 5, name: 'UrbanRetail E-Commerce', industry: 'E-Commerce', contactEmail: 'partnerships@urbanretail.shop', contactPerson: 'David Chen', status: 'Pending', website: 'https://urbanretail.shop' }
-];
+// Empty Production Target List (Ready for CSV Import or Manual Add)
+const DEFAULT_COMPANIES = [];
 
+// Mount2ocean Official Outreach Email Template
 const DEFAULT_TEMPLATE = {
-  subject: 'Unlocking 3x Growth Potential for {{company_name}} in 2026',
+  subject: 'Strategic Growth & Business Collaboration with Mount2ocean for {{company_name}}',
   body: `Hi {{contact_person}},
 
-I noticed the incredible market position of {{company_name}} in the {{industry}} sector. 
+I am reaching out from Mount2ocean regarding potential business collaboration and growth opportunities for {{company_name}} in the {{industry}} sector.
 
-Our team at ApexTech recently developed an AI-driven automation framework designed specifically to streamline operational workflows and lower acquisition costs by up to 42%.
+At Mount2ocean, we specialize in delivering tailored enterprise solutions that help organizations optimize operational throughput and scale revenue efficiently.
 
-Given your role at {{company_name}}, I thought this pitch deck and product brochure would be directly relevant to your quarterly growth initiatives.
+Given your leadership at {{company_name}}, I have attached our latest company profile and service deck for your review.
 
-Would you be open to a brief 10-minute discovery call next Tuesday?
+Would you be open for a brief 10-minute introductory call next week?
 
 Best regards,
 {{sender_name}}
 
 ---
 If you prefer not to receive future updates, you can [Unsubscribe Here] anytime.`,
-  attachments: [
-    { name: 'ApexTech_Enterprise_PitchDeck_2026.pdf', size: '2.4 MB' },
-    { name: 'Product_Brochure_Features.pdf', size: '1.1 MB' }
-  ]
+  attachments: []
 };
 
 const DEFAULT_AI_CONFIG = {
-  enabled: true, // Default AI Bot switch state
+  enabled: true, // AI Bot switch enabled by default
   tone: 'Consultative',
   creativity: 'High',
   autoPersonalize: true
 };
 
-const DEFAULT_SENT_LOGS = [
-  {
-    id: 'LOG-9001',
-    timestamp: '2026-08-01 10:15:22',
-    senderEmail: 'alex.marketing@apextech.com',
-    recipientCompany: 'Nexus Financial Systems',
-    recipientEmail: 'contact@nexusfin.com',
-    industry: 'FinTech',
-    subject: 'AI Financial Compliance & Growth Engine for Nexus Financial Systems',
-    status: 'Delivered',
-    spamScore: '96% Clean (Inbox)',
-    aiOptimized: true,
-    attachments: ['ApexTech_Enterprise_PitchDeck_2026.pdf'],
-    body: `Hi Sarah Jenkins,\n\nIn the fast-evolving FinTech space, compliance efficiency and real-time transaction processing are top priorities for leaders at Nexus Financial Systems.\n\nOur ApexTech suite automates financial data pipeline audits while scaling user onboarding...\n\nBest regards,\nAlex Rivera`
-  },
-  {
-    id: 'LOG-9002',
-    timestamp: '2026-08-01 11:30:05',
-    senderEmail: 'alex.marketing@apextech.com',
-    recipientCompany: 'CarePulse HealthTech',
-    recipientEmail: 'info@carepulsehealth.org',
-    industry: 'Healthcare',
-    subject: 'HIPAA-Compliant Patient Data Automation for CarePulse HealthTech',
-    status: 'Delivered',
-    spamScore: '94% Clean (Inbox)',
-    aiOptimized: true,
-    attachments: ['ApexTech_Enterprise_PitchDeck_2026.pdf'],
-    body: `Hi Dr. Robert Miller,\n\nHealthcare providers like CarePulse HealthTech require seamless, secure patient telemetry and data interoperability...\n\nBest regards,\nAlex Rivera`
-  }
-];
+// Empty Production Sent Logs History
+const DEFAULT_SENT_LOGS = [];
 
 const DEFAULT_OWNER_SETTINGS = {
   maxDailyEmails: 2500,
   staggerDelaySeconds: 4,
   strictSpamThreshold: 85,
   requireUnsubscribeHeader: true,
-  domainReputationStatus: 'Excellent (A+)',
-  spfStatus: 'Verified (v=spf1 include:_spf.apextech.com ~all)',
-  dkimStatus: 'Verified (2048-bit RSA active)',
-  dmarcStatus: 'Verified (p=reject; rua=mailto:dmarc@apextech.com)'
+  domainReputationStatus: 'Verified (Mount2ocean)',
+  spfStatus: 'Verified (v=spf1 include:mount2ocean.com ~all)',
+  dkimStatus: 'Verified (Mount2ocean 2048-bit RSA)',
+  dmarcStatus: 'Verified (p=reject; rua=mailto:dmarc@mount2ocean.com)'
 };
 
 // Global App State Wrapper
