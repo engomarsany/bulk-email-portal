@@ -1,10 +1,27 @@
-# 🚀 MailPulse AI - Bulk Email & Marketing Outreach Portal
+# 🚀 Mount2ocean - Bulk Email Marketing & Outreach Portal
 
 Enterprise-grade **Bulk Email Marketing & Outreach Portal** featuring a Sender Credentials Manager, Lead & File Attachment Manager, optional **AI Email Optimizer Bot** (powered by Gemini AI logic), an **Anti-Spam Deliverability Protection Suite**, and a master **Owner / Admin Control Panel**.
 
-![MailPulse AI Banner](https://img.shields.org/badge/MailPulse-AI%20Bulk%20Engine-6366f1?style=for-the-badge&logo=rocket)
-![Deliverability Health](https://img.shields.org/badge/Deliverability-Inbox%20Ready%20(99.4%25)-10b981?style=for-the-badge&logo=shield)
+![Mount2ocean Banner](https://img.shields.org/badge/Mount2ocean-Bulk%20Email%20Engine-6366f1?style=for-the-badge&logo=rocket)
+![Deliverability Health](https://img.shields.org/badge/Deliverability-Inbox%20Ready%20(99.6%25)-10b981?style=for-the-badge&logo=shield)
+![Daily Capacity](https://img.shields.org/badge/Capacity-20%2C000%20Emails%2FDay-06b6d4?style=for-the-badge)
 ![AI Engine](https://img.shields.org/badge/AI%20Optimizer-Gemini%20Flash-8b5cf6?style=for-the-badge&logo=sparkles)
+
+---
+
+## 🗺️ Quick Links & Pages Index (Sitemap)
+
+| Page / File | GitHub Direct Link | Description |
+| :--- | :--- | :--- |
+| **🌐 Main Live Web App** | [engomarsany.github.io/bulk-email-portal/](https://engomarsany.github.io/bulk-email-portal/) | Live interactive Mount2ocean Email Portal |
+| **📋 Full Pages Index (PAGES.md)** | [PAGES.md](https://github.com/engomarsany/bulk-email-portal/blob/main/PAGES.md) | Complete directory sitemap of all pages and modules |
+| **📄 Main Layout (HTML)** | [index.html](https://github.com/engomarsany/bulk-email-portal/blob/main/index.html) | Main Single Page Application structure |
+| **🎨 Glassmorphism Styles (CSS)** | [css/style.css](https://github.com/engomarsany/bulk-email-portal/blob/main/css/style.css) | Dark theme design system & animations |
+| **🤖 AI Optimizer Bot Module** | [js/ai-optimizer.js](https://github.com/engomarsany/bulk-email-portal/blob/main/js/ai-optimizer.js) | Gemini AI Engine (Travels, Medical, B2B, FinTech, SaaS) |
+| **🛡️ Spam Auditor Engine** | [js/spam-auditor.js](https://github.com/engomarsany/bulk-email-portal/blob/main/js/spam-auditor.js) | Spam score calculator & 1-Click Auto-Fix |
+| **🚀 Bulk Dispatch Console** | [js/dispatcher.js](https://github.com/engomarsany/bulk-email-portal/blob/main/js/dispatcher.js) | Real email dispatcher & console logger |
+| **📊 Owner Oversight Panel** | [js/owner-panel.js](https://github.com/engomarsany/bulk-email-portal/blob/main/js/owner-panel.js) | Owner KPI dashboard & raw email inspector |
+| **⚙️ Node.js SMTP Backend** | [server.js](https://github.com/engomarsany/bulk-email-portal/blob/main/server.js) | Node.js Express server for `mail.mount2ocean.com` |
 
 ---
 
@@ -12,7 +29,7 @@ Enterprise-grade **Bulk Email Marketing & Outreach Portal** featuring a Sender C
 
 ### 1. Dual Access Panel Architecture
 - **Sender Outreach Panel**:
-  - **Sender Credentials Setup**: Authenticate sender email, display name, SMTP server/port, app passwords, and email signature.
+  - **Sender Credentials Setup**: Authenticate sender email (`sales@mount2ocean.com`), display name (`Ahsan | Sales Head`), SMTP server/port, app passwords, and email signature.
   - **CSV Target Lead Importer**: Drag & drop or upload CSV target company lists with automatic column parsing.
   - **File Attachment Support**: Attach pitch decks, PDF brochures, proposals, and images to bulk dispatches.
   - **Dynamic Token Composer**: Insert variable tags (`{{company_name}}`, `{{contact_person}}`, `{{industry}}`, `{{sender_name}}`) into email body & subject lines.
@@ -26,13 +43,13 @@ Enterprise-grade **Bulk Email Marketing & Outreach Portal** featuring a Sender C
 ---
 
 ### 2. AI Email Optimizer Bot (Optional Toggle Switch)
-- **ON State**: Gemini-powered AI engine customizes subject lines, opening hooks, value propositions, and calls to action specifically tailored to each recipient's industry (e.g. FinTech, Healthcare, SaaS, E-Commerce, Logistics, Manufacturing).
+- **ON State**: Gemini-powered AI engine customizes subject lines, opening hooks, value propositions, and calls to action specifically tailored to each recipient's industry (e.g. **Travels**, **Medical**, **B2B**, **FinTech**, **Healthcare**, **SaaS**, **E-Commerce**, **Logistics**, **Manufacturing**).
 - **OFF State**: Uses classic template token replacement mode.
 - **Live AI Preview Modal**: Displays a side-by-side comparison of standard template copy vs AI-tailored copy for any target company.
 
 ---
 
-### 3. Anti-Spam & Deliverability Engine (In-box Protection)
+### 3. Anti-Spam & Deliverability Engine (Inbox Protection)
 - **Real-Time Spam Auditor (0-100%)**:
   - Scans for spam trigger phrases ("100% free", "click here", "act now", ALL CAPS subject lines).
   - Verifies presence of dynamic personalization tokens.
@@ -42,26 +59,13 @@ Enterprise-grade **Bulk Email Marketing & Outreach Portal** featuring a Sender C
 
 ---
 
-## 📁 Repository Directory Structure
+## 🏢 Mount2ocean Profile & Capacity
 
-```
-bulk-email-portal/
-├── index.html          # Main Single Page Application Entry Point
-├── css/
-│   └── style.css       # Enterprise Glassmorphism CSS Design System
-├── js/
-│   ├── state.js        # AppState & LocalStorage Persistence Engine
-│   ├── ai-optimizer.js # Gemini AI Email Optimizer Bot Engine
-│   ├── spam-auditor.js # Spam Deliverability Inspector Engine
-│   ├── sender.js       # Sender Account & SMTP Setup Controller
-│   ├── leads.js        # Target Companies & File Attachment Manager
-│   ├── composer-ui.js  # Email Composer & AI UI Controller
-│   ├── spam-auditor-ui.js # Deliverability UI & 1-Click Auto-Fix
-│   ├── dispatcher.js   # Bulk Email Staggered Dispatcher & Live Logs
-│   ├── owner-panel.js  # Owner Master Oversight Panel
-│   └── app.js          # Main Application Router & Toast Engine
-└── README.md           # Project Documentation
-```
+- **Company**: Mount2ocean
+- **Sender Email**: `sales@mount2ocean.com`
+- **Sender Name**: Ahsan | Sales Head
+- **Daily Capacity**: 20,000 Emails / Day
+- **Signature**: Mount2ocean | website: mount2ocean.com | Tel: +880 1977-477172
 
 ---
 
@@ -75,4 +79,4 @@ Simply open `index.html` in any web browser!
 
 ## 📄 License
 
-MIT License - feel free to use and customize for your outreach campaigns!
+MIT License - Mount2ocean Official
