@@ -3,6 +3,11 @@
    ========================================================================== */
 
 const INDUSTRY_AI_PROMPTS = {
+  'Printing-Finishing': {
+    hook: "In the printing-finishing and member mills sector, optimizing production workflows, batch quality control, and supply chain timelines are key drivers of success.",
+    valueProp: "Mount2ocean offers specialized digital workflow orchestration and automation solutions tailored for printing, finishing, and member mills.",
+    cta: "Are you available for a brief 10-minute introductory call next week to discuss optimizing mill operations?"
+  },
   Travels: {
     hook: "In the dynamic travel, tourism, and hospitality sector, seamless booking experiences, personalized itineraries, and partner logistics drive customer loyalty.",
     valueProp: "Mount2ocean provides high-efficiency travel automation and partner management frameworks to optimize booking throughput.",
@@ -66,6 +71,10 @@ class AIOptimizerBot {
   resolveIndustryKey(industryInput = '') {
     if (!industryInput) return 'General';
     const str = industryInput.toLowerCase();
+
+    if (str.includes('print') || str.includes('finish') || str.includes('mill') || str.includes('textile')) {
+      return 'Printing-Finishing';
+    }
 
     if (str.includes('travel') || str.includes('tourism') || str.includes('hotel') || str.includes('hospitality')) {
       return 'Travels';
