@@ -1,6 +1,6 @@
 /* ==========================================================================
    BULK EMAIL DISPATCH ENGINE & AUTOMATIC REAL INBOX DELIVERY - MOUNT2OCEAN
-   ========================================================================== */
+   ========================================================================= */
 
 class DispatcherController {
   constructor() {
@@ -43,17 +43,20 @@ class DispatcherController {
   }
 
   /**
-   * Guaranteed Real Email Dispatch API via Resend API
+   * Guaranteed Real Email Dispatch API via Resend API (CORS-Proxy Integrated)
    */
   async sendAuthenticMount2oceanEmail(sender, recipientEmail, recipientName, subject, bodyText) {
     const token = (sender.appPassword && sender.appPassword.trim()) ? sender.appPassword.trim() : '';
 
-    // 1. Resend API Dispatch (Formats sender to onboarding@resend.dev for guaranteed delivery)
+    // 1. Resend API Dispatch (Routed through CORS Proxy to bypass browser security block)
     if (token && token.startsWith('re_')) {
       try {
         const payloadFrom = `${sender.name || 'Ahsan | Mount2ocean'} <onboarding@resend.dev>`;
         
-        const res = await fetch('https://api.resend.com/emails', {
+        // High-speed, secure CORS proxy to bypass browser fetch blockages
+        const proxyUrl = 'https://corsproxy.io/?https://api.resend.com/emails';
+
+        const res = await fetch(proxyUrl, {
           method: 'POST',
           headers: {
             'Authorization': `Bearer ${token}`,
@@ -71,15 +74,38 @@ class DispatcherController {
         if (res.ok && data.id) {
           return { success: true, provider: 'Resend API (Real Inbox)', id: data.id };
         } else {
-          const errDetail = (data && data.message) ? data.message : JSON.stringify(data);
+          const errDetail = (data && data.message) ? data.message : (data.name || 'Resend Restriction');
           return { success: false, error: errDetail };
         }
       } catch (err) {
-        return { success: false, error: err.message };
+        // Retry using alternative backup proxy in case proxyUrl rate-limits
+        try {
+          const backupProxyUrl = 'https://api.allorigins.win/raw?url=' + encodeURIComponent('https://api.resend.com/emails');
+          const res = await fetch(backupProxyUrl, {
+            method: 'POST',
+            headers: {
+              'Authorization': `Bearer ${token}`,
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+              from: `${sender.name || 'Ahsan | Mount2ocean'} <onboarding@resend.dev>`,
+              to: [recipientEmail],
+              subject: subject,
+              text: bodyText
+            })
+          });
+          const data = await res.json();
+          if (res.ok && data.id) {
+            return { success: true, provider: 'Resend API (Real Inbox Backup)', id: data.id };
+          }
+        } catch (backupErr) {
+          // Both proxies failed
+        }
+        return { success: false, error: 'Browser Network Block (CORS Error) - Try verifying domain in Resend' };
       }
     }
 
-    // 2. Backup Brevo API
+    // 2. Backup Brevo API (Supports Native CORS)
     if (token && token.startsWith('xkeysib-')) {
       try {
         const res = await fetch('https://api.brevo.com/v3/smtp/email', {
@@ -101,6 +127,27 @@ class DispatcherController {
         });
         const data = await res.json();
         if (res.ok) return { success: true, provider: 'Brevo API', data };
+      } catch (err) {
+        return { success: false, error: err.message };
+      }
+    }
+
+    // 3. cPanel PHP Relay Gateway Support (Zero CORS issue, secure domain transmission)
+    if (sender.smtpHost && sender.smtpHost.startsWith('http')) {
+      try {
+        const res = await fetch(sender.smtpHost, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            recipientEmail,
+            subject,
+            bodyText
+          })
+        });
+        if (res.ok) {
+          const data = await res.json();
+          return { success: true, provider: 'cPanel PHP Gateway', data };
+        }
       } catch (err) {
         return { success: false, error: err.message };
       }
@@ -138,7 +185,7 @@ class DispatcherController {
 
     this.logMessage(`🚀 Initializing Mount2ocean Bulk Dispatch Engine for ${companies.length} target companies...`, 'success');
     this.logMessage(`🔑 Sender Identity: "${sender.name || 'Ahsan | Mount2ocean'}" <${sender.email || 'sales@mount2ocean.com'}>`, 'info');
-    this.logMessage(`⚡ Resend Cloud Delivery Engine: ACTIVE`, 'success');
+    this.logMessage(`⚡ CORS-Bypass Proxy Gateway: ACTIVE`, 'success');
     this.logMessage(`⏱️ Staggered Delay: ${delaySec} seconds / email`, 'info');
 
     const total = companies.length;
@@ -193,7 +240,7 @@ class DispatcherController {
         recipientEmail: comp.contactEmail,
         industry: comp.industry,
         subject: finalSubject,
-        status: isReal ? `Delivered Real Inbox (${result.provider})` : 'Delivery Response Received',
+        status: isReal ? `Delivered Real Inbox (${result.provider})` : 'Delivery Notice',
         spamScore: `${audit.score}% Clean (Inbox)`,
         aiOptimized: isAiOptimized,
         attachments: (template.attachments || []).map(a => a.name),
@@ -205,7 +252,10 @@ class DispatcherController {
       if (isReal) {
         this.logMessage(`📬 REAL EMAIL DELIVERED to ${comp.contactEmail}! (Resend ID: ${result.id})`, 'success');
       } else {
-        this.logMessage(`⚠️ Resend Response for ${comp.contactEmail}: ${result.error || 'Check Sender Credentials'}`, 'spam');
+        this.logMessage(`⚠️ Resend Response for ${comp.contactEmail}: ${result.error}`, 'error');
+        if (result.error && result.error.includes('own email address')) {
+          this.logMessage(`💡 Tip: Resend free tier only allows sending to your own signup email (eng.omarsany@gmail.com) until you verify mount2ocean.com at resend.com/domains`, 'purple');
+        }
       }
 
       this.updateProgress(completed, total);
