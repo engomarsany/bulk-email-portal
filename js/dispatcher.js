@@ -48,10 +48,11 @@ class DispatcherController {
   async sendAuthenticMount2oceanEmail(sender, recipientEmail, recipientName, subject, bodyText) {
     const token = (sender.appPassword && sender.appPassword.trim()) ? sender.appPassword.trim() : '';
 
-    // 1. Resend API Dispatch (Routed through CORS Proxy to bypass browser security block)
+    // 1. Resend API Dispatch (Formats sender to verified sales@mount2ocean.com for production)
     if (token && token.startsWith('re_')) {
       try {
-        const payloadFrom = `${sender.name || 'Ahsan | Mount2ocean'} <onboarding@resend.dev>`;
+        // Since mount2ocean.com domain is verified, send authentic from sales@mount2ocean.com
+        const payloadFrom = `${sender.name || 'Ahsan | Sales Head'} <${sender.email || 'sales@mount2ocean.com'}>`;
         
         // High-speed, secure CORS proxy to bypass browser fetch blockages
         const proxyUrl = 'https://corsproxy.io/?https://api.resend.com/emails';
@@ -88,7 +89,7 @@ class DispatcherController {
               'Content-Type': 'application/json'
             },
             body: JSON.stringify({
-              from: `${sender.name || 'Ahsan | Mount2ocean'} <onboarding@resend.dev>`,
+              from: `${sender.name || 'Ahsan | Sales Head'} <${sender.email || 'sales@mount2ocean.com'}>`,
               to: [recipientEmail],
               subject: subject,
               text: bodyText
@@ -127,27 +128,6 @@ class DispatcherController {
         });
         const data = await res.json();
         if (res.ok) return { success: true, provider: 'Brevo API', data };
-      } catch (err) {
-        return { success: false, error: err.message };
-      }
-    }
-
-    // 3. cPanel PHP Relay Gateway Support (Zero CORS issue, secure domain transmission)
-    if (sender.smtpHost && sender.smtpHost.startsWith('http')) {
-      try {
-        const res = await fetch(sender.smtpHost, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            recipientEmail,
-            subject,
-            bodyText
-          })
-        });
-        if (res.ok) {
-          const data = await res.json();
-          return { success: true, provider: 'cPanel PHP Gateway', data };
-        }
       } catch (err) {
         return { success: false, error: err.message };
       }
