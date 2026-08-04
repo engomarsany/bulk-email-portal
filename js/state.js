@@ -805,16 +805,23 @@ const DEFAULT_COMPANIES = [
 
 // Mount2ocean Official Outreach Email Template
 const DEFAULT_TEMPLATE = {
-  subject: 'Strategic Growth & Business Collaboration with Mount2ocean for {{company_name}}',
-  body: `Hi {{contact_person}},
+  subject: 'Tailored Corporate Travel & Event Management Solutions for {{company_name}}',
+  body: `Hi {{contact_person}} Sir ,
 
-I am reaching out from Mount2ocean regarding potential business collaboration and growth opportunities for {{company_name}} in the {{industry}} sector.
+I am reaching out from Mount 2 Ocean Travel & Tours regarding potential business collaboration and corporate travel management solutions for {{company_name}} in the {{industry}} sector.  
 
-At Mount2ocean, we specialize in delivering tailored enterprise solutions that help organizations optimize operational throughput and scale revenue efficiently.
+At Mount 2 Ocean Travel & Tours, we specialize in delivering end-to-end travel, MICE (Meetings, Incentives, Conferences, and Exhibitions), and logistical solutions tailored to help organizations optimize their operational efficiency and streamline corporate travel budgets.  
 
-Given your leadership at {{company_name}}, I have attached our latest company profile and service deck for your review.
+Our Key Solutions Include:
+•	Air Ticketing & Visa Processing: Seamless domestic/international flight bookings with live visa tracking support.  
+•	Corporate Event & MICE Support: Complete planning and execution for international conferences, corporate retreats, and exhibitions.  
+•	Global Accommodation: Exclusive corporate rates at over 500+ luxury hotels and resorts worldwide.  
+•	Transportation & Logistics: Chauffeur services, tourist buses, and premium transport arrangements.  
+•	Medical & Specialized Tourism: Comprehensive medical travel assistance via our dedicated Medi Adviser division.  
 
-Would you be open for a brief 10-minute introductory call next week?
+Given your leadership at {{company_name}}, I have attached our latest company profile for your review. As an IATA-accredited and Ministry-approved travel agency in Bangladesh, we are confident in our ability to deliver exceptional value to your organization.  
+
+Would you be open to a brief 10-minute introductory call next week to discuss how we can support {{company_name}}?
 
 Best regards,
 {{sender_name}}
